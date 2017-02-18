@@ -25,10 +25,21 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationTest extends TestCase
 {
+     public $rules;
+     
+     public function setUp()
+    {
+        $this->rules = [];
+    }
+    
+    public function tearDown()
+    {
+        unset($this->rules);
+    }
  
     public function testValidation()
     {
-		$this->markTestIncomplete();
+        $this->markTestIncomplete();
     }
 
 }

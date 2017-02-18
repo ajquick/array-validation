@@ -97,6 +97,8 @@ class Validation
     }
     
     /**
+	 * Function returns true if all required checks pass, and false if a required check fails.
+	 *
      * @param array $array
      * @param array $rules
      * @return bool
@@ -111,6 +113,7 @@ class Validation
                         foreach ($value['required'] as $key2 => $value2) {
                             if (is_array($value)) {
                                 foreach ($value2 as $key3 => $value3) {
+									
                                 }
                             } else {
                                 if ($value2 === null || $value2 == 'null') {
