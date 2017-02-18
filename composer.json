@@ -1,0 +1,26 @@
+{
+    "name": "multidimensional/array-validation",
+    "description": "Validate an array using rules from another array.",
+    "authors": [{
+        "name": "multidimension.al",
+        "homepage": "https://multidimension.al",
+        "role": "Developer"
+    }],
+    "require": {
+        "php": ">=5.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Multidimensional\\ArrayValidation\\": "lib"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Multidimensional\\ArrayValidation\\Test\\": "tests"
+        }
+    }
+}
