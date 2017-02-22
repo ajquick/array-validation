@@ -1,10 +1,10 @@
 <?php
 /**    __  ___      ____  _     ___                           _                    __
  *    /  |/  /_  __/ / /_(_)___/ (_)___ ___  ___  ____  _____(_)___  ____   ____ _/ /
- *   / /|_/ / / / / / __/ / __  / / __ `__ \/ _ \/ __ \/ ___/ / __ \/ __ \ / __ `/ / 
- *  / /  / / /_/ / / /_/ / /_/ / / / / / / /  __/ / / (__  ) / /_/ / / / // /_/ / /  
- * /_/  /_/\__,_/_/\__/_/\__,_/_/_/ /_/ /_/\___/_/ /_/____/_/\____/_/ /_(_)__,_/_/   
- *                                                                                  
+ *   / /|_/ / / / / / __/ / __  / / __ `__ \/ _ \/ __ \/ ___/ / __ \/ __ \ / __ `/ /
+ *  / /  / / /_/ / / /_/ / /_/ / / / / / / /  __/ / / (__  ) / /_/ / / / // /_/ / /
+ * /_/  /_/\__,_/_/\__/_/\__,_/_/_/ /_/ /_/\___/_/ /_/____/_/\____/_/ /_(_)__,_/_/
+ *
  * CONFIDENTIAL
  *
  * © 2017 Multidimension.al - All Rights Reserved
@@ -72,6 +72,8 @@ class Validation
             return false;
         }
         
+		//check required
+		
         if (isset($rules['type'])) {
             if (($rules['type'] === 'integer' && !$this->validateInteger($value, $key))
                 || ($rules['type'] === 'decimal' && !$this->validateDecimal($value, $key))
@@ -81,13 +83,13 @@ class Validation
                 return false;
             }
         }
-        
+
         if (isset($rules['values']) ){
-            if (!$this->validateValues($value, $rules['values'])) {                
+            if (!$this->validateValues($value, $rules['values'])) {
                 return false;
             }
         }
-        
+
         if (isset($rules['pattern'])) {
             if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
                 || (!$this->validatePattern($value, $rules['pattern'], $key))){
@@ -197,7 +199,7 @@ class Validation
         
         return;
     }
-    
+
     /**
      * @param array $array
      * @param string $key
@@ -212,7 +214,7 @@ class Validation
         }
         
     }
-    
+
     /**
      * @param array $array
      * @param string $key
@@ -225,9 +227,8 @@ class Validation
         }else {
             return false;
         }
-        
     }
-    
+
     /**
      * @param int         $value
      * @param string|null $key
@@ -246,7 +247,7 @@ class Validation
         
         return true;
     }
-    
+
     /**
      * @param float       $value
      * @param string|null $key
@@ -349,7 +350,7 @@ class Validation
                 $compareScore = strcasecmp($value, $key);
                 $compareArray[$key] = $compareScore;
                 if ($compareScore === 0) {
-                    return true;    
+                    return true;
                 }
             }
         } elseif (strcasecmp($value, $array) === 0) {
