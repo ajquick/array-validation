@@ -8,7 +8,7 @@
  * CONFIDENTIAL
  *
  * © 2017 Multidimension.al - All Rights Reserved
- * 
+ *
  * NOTICE:  All information contained herein is, and remains the property of
  * Multidimension.al and its suppliers, if any.  The intellectual and
  * technical concepts contained herein are proprietary to Multidimension.al
@@ -29,6 +29,8 @@ class Validation
     {
         $this->error = false;
         $this->errorMessage = null;
+        
+        return;
     }
     
     /**
@@ -39,14 +41,13 @@ class Validation
     public function validate($array, $rules)
     {
         if (is_array($array)) {
+            if (!$this->required($array, $rules)) {
+                return false;
+            }
             foreach ($array as $key => $value) {
                 if (!isset($rules[$key]) || $this->validateField($value, $rules[$key], $key) !== true) {
                     return false;
                 }
-            }
-            
-            if (!$this->checkRequired($array, $rules)) {
-                return false;
             }
         }
  
@@ -71,9 +72,7 @@ class Validation
             $this->setError(sprintf("Unexpected array found for key %s.", $key));
             return false;
         }
-        
-		//check required
-		
+
         if (isset($rules['type'])) {
             if (($rules['type'] === 'integer' && !$this->validateInteger($value, $key))
                 || ($rules['type'] === 'decimal' && !$this->validateDecimal($value, $key))
@@ -101,6 +100,28 @@ class Validation
     }
     
     /**
+     * @param array $array
+     * @param array $rules
+     * @return true|false
+     */
+    public function required($array, $rules)
+    {
+        if (is_array($rules)) {
+            foreach ($rules as $key => $value) {
+                if (isset($value['required'])) {
+                    if (!$this->checkRequired($array, $rules)) {
+                        return false;    
+                    }
+                }
+            }    
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+    
+    /**
      * Function returns true if all required checks pass, and false if a required check fails.
      *
      * @param array $array
@@ -109,43 +130,35 @@ class Validation
      */
     public function checkRequired($array, $rules)
     {
-        if (is_array($rules)) {
-            foreach ($rules as $key => $value) {
-                if (isset($value['required']) && !isset($array[$key])) {
-                    $failure = true;
-                    if (is_array($value['required'])) {
-                        foreach ($value['required'] as $key2 => $value2) {
-                            if (is_array($value)) {
-                                foreach ($value2 as $key3 => $value3) {
-                                    
-                                }
-                            } else {
-                                if ($value2 === null || $value2 == 'null') {
-                                    if (!isset($array[$key2]) && $array[$key2] !== null && $array[$key2] != 'null') {
-                                        $failure = false;
-                                    }
-                                } else {
-                                    if (!isset($array[$key2]) && $array[$key2] != $value2) {
-                                        $failure = false;
-                                    }
-                                }
-                            }
+        $failure = true;
+        if (is_array($value['required'])) {
+            foreach ($value['required'] as $key2 => $value2) {
+                if (is_array($value)) {
+                    foreach ($value2 as $key3 => $value3) {
+                        
+                    }
+                } else {
+                    if ($value2 === null || $value2 == 'null') {
+                        if (!isset($array[$key2]) && $array[$key2] !== null && $array[$key2] != 'null') {
+                            $failure = false;
                         }
-                    } elseif ($value['required'] === true || $value['required'] == 'true') {
-                        if (!isset($array[$key])) {
-                            return false;
-                        } else {
+                    } else {
+                        if (!isset($array[$key2]) && $array[$key2] != $value2) {
                             $failure = false;
                         }
                     }
-                    if ($failure === true) {
-                        return false;
-                    }
                 }
             }
-            return true;
-        } else {
+        } elseif ($value['required'] === true || $value['required'] == 'true') {
+            if (!isset($array[$key])) {
+                return false;
+            } else {
+                $failure = false;
+            }
+        }
+        if ($failure === true) {
             return false;
+        }
         }
     }
     
