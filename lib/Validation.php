@@ -82,13 +82,15 @@ class Validation
             }
         }
         
-        if (isset($rules['pattern'])) {
-            if ($rules['pattern'] == 'ISO 8601') {
-                $rules['pattern'] = '([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?';
+        if (isset($rules['values']) ){
+            if (!$this->validateValues($value, $rules['values'])) {                
+                return false;
             }
-            
-            if (!preg_match('/^' . $rules['pattern'] . '$/', $value)) {
-                $this->setError(sprintf("Invalid value %s does not match pattern '%s' for key %s.", $value, $rules['pattern'], $key));
+        }
+        
+        if (isset($rules['pattern'])) {
+            if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
+                || (!$this->validatePattern($value, $rules['pattern'], $key))){
                 return false;
             }
         }
@@ -97,8 +99,8 @@ class Validation
     }
     
     /**
-	 * Function returns true if all required checks pass, and false if a required check fails.
-	 *
+     * Function returns true if all required checks pass, and false if a required check fails.
+     *
      * @param array $array
      * @param array $rules
      * @return bool
@@ -113,7 +115,7 @@ class Validation
                         foreach ($value['required'] as $key2 => $value2) {
                             if (is_array($value)) {
                                 foreach ($value2 as $key3 => $value3) {
-									
+                                    
                                 }
                             } else {
                                 if ($value2 === null || $value2 == 'null') {
@@ -197,6 +199,36 @@ class Validation
     }
     
     /**
+     * @param array $array
+     * @param string $key
+     * @retrun true|false
+     */
+    protected function requiredNull($array, $key)
+    {
+        if (!isset($array[$key])) {
+            return true;
+        }else {
+            return false;
+        }
+        
+    }
+    
+    /**
+     * @param array $array
+     * @param string $key
+     * @retrun true|false
+     */
+    protected function requiredTrue($array, $key)
+    {
+        if (!isset($array[$key])) {
+            return true;
+        }else {
+            return false;
+        }
+        
+    }
+    
+    /**
      * @param int         $value
      * @param string|null $key
      * @return true|false
@@ -270,5 +302,77 @@ class Validation
         }
         
         return true;
+    }
+    
+    /**
+     * @param string $value
+     * @param string $pattern
+     * @param string $key
+     * @return bool
+     */
+    protected function validatePattern($value, $pattern, $key = null)
+    {
+        if (!preg_match('/^' . $pattern . '$/', $value)) {
+            if (is_null($key)) {
+                $this->setError(sprintf("Invalid value %s does not match pattern '%s' for key %s.", $value, $pattern, $key));
+            } else {
+                $this->setError(sprintf("Invalid value %s does not match pattern '%s'.", $value, $pattern));
+            }
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     */
+    protected function validateISO8601($value, $key = null)
+    {
+        $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
+        return self::validatePattern($value, $pattern, $key);
+    }
+    
+    /**
+     * @param string $value
+     * @param array|string $array
+     * @param string|null $key
+     * @return bool
+     */
+    protected function validateValues($value, $array, $key = null)
+    {
+        $compareArray = [];
+        if (is_array($array)) {
+            foreach ($array as $key) {
+                $compareScore = strcasecmp($value, $key);
+                $compareArray[$key] = $compareScore;
+                if ($compareScore === 0) {
+                    return true;    
+                }
+            }
+        } elseif (strcasecmp($value, $array) === 0) {
+            return true;
+        }
+        
+        $errorMessage = '';
+        
+        if (is_null($key)) {
+            $errorMessage = sprintf('Invalid value %s for key %s.', $value, $key);
+        } else {
+            $errorMessage = sprintf('Invalid value %s.', $value);
+        }
+        
+        $compareArray = array_walk($compareArray, 'abs');
+        asort($compareArray);
+        
+        if (count($compareArray)) {
+            $errorMessage .= sprintf(' Did you mean %s?', array_shift($compareArray));
+        }
+        
+        $this->setError($errorMessage);
+        
+        return false;
     }
 }

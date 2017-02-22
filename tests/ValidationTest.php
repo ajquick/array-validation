@@ -20,7 +20,7 @@
 
 namespace Multidimensional\ArrayValidation\Test;
 
-use Multidimensional\ArrayValidation\Validate;
+use Multidimensional\ArrayValidation\Validation;
 use PHPUnit\Framework\TestCase;
 
 class ValidationTest extends TestCase
