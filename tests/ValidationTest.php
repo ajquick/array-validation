@@ -25,16 +25,16 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationTest extends TestCase
 {
-     public $rules;
+     public $validation;
      
      public function setUp()
     {
-        $this->rules = [];
+        $this->validation = new Validation();
     }
     
     public function tearDown()
     {
-        unset($this->rules);
+        unset($this->validation);
     }
  
     public function testValidation()

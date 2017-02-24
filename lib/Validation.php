@@ -108,17 +108,16 @@ class Validation
     {
         if (is_array($rules)) {
             foreach ($rules as $key => $value) {
-                if (isset($value['required'])) {
-                    if (!$this->checkRequired($array, $rules)) {
+                if (isset($value['required']) && $value['required'] != null && $value['required'] != 'null') {
+                    if (!$this->checkRequired($array, $value['required'], $key)) {
                         return false;    
                     }
                 }
             }    
             return true;
-        } else {
-            return false;
         }
         
+        return false;
     }
     
     /**
@@ -128,12 +127,12 @@ class Validation
      * @param array $rules
      * @return bool
      */
-    public function checkRequired($array, $rules)
+    public function checkRequired($array, $required, $key)
     {
-        $failure = true;
-        if (is_array($value['required'])) {
-            foreach ($value['required'] as $key2 => $value2) {
-                if (is_array($value)) {
+        if (is_array($required)) {
+            $failure = true;
+            foreach ($required as $value) {
+               	/*if (is_array($value)) {
                     foreach ($value2 as $key3 => $value3) {
                         
                     }
@@ -148,17 +147,16 @@ class Validation
                         }
                     }
                 }
+                */
             }
-        } elseif ($value['required'] === true || $value['required'] == 'true') {
-            if (!isset($array[$key])) {
+            if ($failure === true) {
                 return false;
-            } else {
-                $failure = false;
             }
-        }
-        if ($failure === true) {
+        } elseif (($required === true || $required == 'true') && !$this->requiredTrue($array, $key)){
             return false;
         }
+        
+        return true;
     }
     
     /**
@@ -211,20 +209,20 @@ class Validation
         
         return;
     }
-
-    /**
+	
+	/**
      * @param array $array
      * @param string $key
      * @retrun true|false
      */
     protected function requiredNull($array, $key)
     {
-        if (!isset($array[$key])) {
+        if ((!isset($array[$key]) && !array_key_exists($key, $array)) || ((isset($array[$key]) || array_key_exists($key, $array))  && ($array[$key] === null || $array[$key] == 'null'))) {
             return true;
-        }else {
-            return false;
         }
-        
+		$this->setError(sprintf("Required value not found for key %s.", $key));
+		
+        return false;
     }
 
     /**
@@ -234,11 +232,12 @@ class Validation
      */
     protected function requiredTrue($array, $key)
     {
-        if (!isset($array[$key])) {
+        if (isset($array[$key]) || array_key_exists($key, $array)) {
             return true;
-        }else {
-            return false;
         }
+		$this->setError(sprintf("Required value not found for key %s.", $key));
+		
+        return false;
     }
 
     /**
