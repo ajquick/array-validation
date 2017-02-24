@@ -83,7 +83,7 @@ class Validation
             }
         }
 
-        if (isset($rules['values']) ){
+        if (isset($rules['values'])) {
             if (!$this->validateValues($value, $rules['values'])) {
                 return false;
             }
@@ -91,7 +91,7 @@ class Validation
 
         if (isset($rules['pattern'])) {
             if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
-                || (!$this->validatePattern($value, $rules['pattern'], $key))){
+                || (!$this->validatePattern($value, $rules['pattern'], $key))) {
                 return false;
             }
         }
@@ -110,10 +110,10 @@ class Validation
             foreach ($rules as $key => $value) {
                 if (isset($value['required']) && $value['required'] != null && $value['required'] != 'null') {
                     if (!$this->checkRequired($array, $value['required'], $key)) {
-                        return false;    
+                        return false;
                     }
                 }
-            }    
+            }
             return true;
         }
         
@@ -132,7 +132,7 @@ class Validation
         if (is_array($required)) {
             $failure = true;
             foreach ($required as $value) {
-               	/*if (is_array($value)) {
+                   /*if (is_array($value)) {
                     foreach ($value2 as $key3 => $value3) {
                         
                     }
@@ -152,7 +152,7 @@ class Validation
             if ($failure === true) {
                 return false;
             }
-        } elseif (($required === true || $required == 'true') && !$this->requiredTrue($array, $key)){
+        } elseif (($required === true || $required == 'true') && !$this->requiredTrue($array, $key)) {
             return false;
         }
         
@@ -209,8 +209,8 @@ class Validation
         
         return;
     }
-	
-	/**
+    
+    /**
      * @param array $array
      * @param string $key
      * @retrun true|false
@@ -220,8 +220,8 @@ class Validation
         if ((!isset($array[$key]) && !array_key_exists($key, $array)) || ((isset($array[$key]) || array_key_exists($key, $array))  && ($array[$key] === null || $array[$key] == 'null'))) {
             return true;
         }
-		$this->setError(sprintf("Required value not found for key %s.", $key));
-		
+        $this->setError(sprintf("Required value not found for key %s.", $key));
+        
         return false;
     }
 
@@ -235,8 +235,8 @@ class Validation
         if (isset($array[$key]) || array_key_exists($key, $array)) {
             return true;
         }
-		$this->setError(sprintf("Required value not found for key %s.", $key));
-		
+        $this->setError(sprintf("Required value not found for key %s.", $key));
+        
         return false;
     }
 
