@@ -159,7 +159,6 @@ class Validation
         if ($failure === true) {
             return false;
         }
-        }
     }
     
     /**
