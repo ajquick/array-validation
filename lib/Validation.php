@@ -110,9 +110,9 @@ class Validation
         if (is_array($rules)) {
             foreach ($rules as $key => $value) {
                 if (isset($value['required'])
-                    && $value['required'] != null
+                    && $value['required'] !== null
                     && $value['required'] != 'null') {
-                    if (!$this->checkRequired($array, $value['required'], $key)) {
+                    if (!isset($array[$key]) && !array_key_exists($key, $array) && !$this->checkRequired($array, $value['required'], $key)) {
                         return false;
                     }
                 }
@@ -239,7 +239,7 @@ class Validation
      */
     protected function requiredOne($array, $rules, $key = null)
     {
-           if (is_array($rules)) {
+        if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
 				if ((is_array($rulesKey) && $this->requiredAll($array, $rulesKey, $key))
 					|| ($this->requiredTest($array, $rulesKey, $rulesValue))) {
@@ -263,7 +263,7 @@ class Validation
         if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
                 if (!$this->requiredTest($array, $rulesKey, $rulesValue)) {
-                    $this->setError(sprintf());
+                    $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
                     return false;    
                 }
             }
@@ -274,7 +274,14 @@ class Validation
     
     protected function requiredTest($array, $key, $value)
     {
-        
+        if ($value === null || $value == 'null') {
+			return $this->requiredNull($array, $key);
+		} elseif ($value === true || $value == 'true') {
+			return $this->requiredTrue($array, $key);
+		} elseif (isset($array[$key]) && $array[$key] == $value) {
+			$this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+			return false;
+		}
 		
 		return true;
     }
