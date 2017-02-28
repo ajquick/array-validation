@@ -40,7 +40,7 @@ class Validation
      */
     public function validate($array, $rules)
     {
-        if (is_array($array)) {
+        if (is_array($array) && is_array($rules)) {
             if (!$this->required($array, $rules)) {
                 return false;
             }
@@ -50,7 +50,13 @@ class Validation
                     return false;
                 }
             }
-        }
+        } elseif(!is_array($array)) {
+			$this->setError("Validation array not found.");
+			return false;
+		} elseif(!is_array($rules)) {
+			$this->setError("Validation rules array not found.");
+			return false;
+		}
  
         if ($this->isSuccess()) {
             return true;
@@ -74,26 +80,28 @@ class Validation
             return false;
         }
 
-        if (isset($rules['type'])) {
-            if (($rules['type'] === 'integer' && !$this->validateInteger($value, $key))
-                || ($rules['type'] === 'decimal' && !$this->validateDecimal($value, $key))
-                || ($rules['type'] === 'string'  && !$this->validateString($value, $key))
-                || ($rules['type'] === 'boolean' && !$this->validateBoolean($value, $key))
-            ) {
-                return false;
+        if (isset($value) && $value !== null && $value != 'null') {
+            if (isset($rules['type'])) {
+                if (($rules['type'] === 'integer' && !$this->validateInteger($value, $key))
+                    || ($rules['type'] === 'decimal' && !$this->validateDecimal($value, $key))
+                    || ($rules['type'] === 'string'  && !$this->validateString($value, $key))
+                    || ($rules['type'] === 'boolean' && !$this->validateBoolean($value, $key))
+                ) {
+                    return false;
+                }
             }
-        }
-
-        if (isset($rules['values'])) {
-            if (!$this->validateValues($value, $rules['values'])) {
-                return false;
+    
+            if (isset($rules['values'])) {
+                if (!$this->validateValues($value, $rules['values'])) {
+                    return false;
+                }
             }
-        }
-
-        if (isset($rules['pattern'])) {
-            if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
-                || (!$this->validatePattern($value, $rules['pattern'], $key))) {
-                return false;
+    
+            if (isset($rules['pattern'])) {
+                if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
+                    || (!$this->validatePattern($value, $rules['pattern'], $key))) {
+                    return false;
+                }
             }
         }
         
@@ -133,9 +141,9 @@ class Validation
     public function checkRequired($array, $required, $key)
     {
         if (is_array($required)) {
-			if (!$this->requiredOne($array, $value, $key)) {
-				return false;	
-			}
+            if (!$this->requiredOne($array, $value, $key)) {
+                return false;    
+            }
         } elseif (($required === true || $required == 'true')
             && !$this->requiredTrue($array, $key)) {
             return false;
@@ -241,8 +249,8 @@ class Validation
     {
         if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
-				if ((is_array($rulesKey) && $this->requiredAll($array, $rulesKey, $key))
-					|| ($this->requiredTest($array, $rulesKey, $rulesValue))) {
+                if ((is_array($rulesKey) && $this->requiredAll($array, $rulesKey, $key))
+                    || ($this->requiredTest($array, $rulesKey, $rulesValue))) {
                     return true;    
                 }
             }
@@ -275,15 +283,15 @@ class Validation
     protected function requiredTest($array, $key, $value)
     {
         if ($value === null || $value == 'null') {
-			return $this->requiredNull($array, $key);
-		} elseif ($value === true || $value == 'true') {
-			return $this->requiredTrue($array, $key);
-		} elseif (isset($array[$key]) && $array[$key] == $value) {
-			$this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
-			return false;
-		}
-		
-		return true;
+            return $this->requiredNull($array, $key);
+        } elseif ($value === true || $value == 'true') {
+            return $this->requiredTrue($array, $key);
+        } elseif (isset($array[$key]) && $array[$key] == $value) {
+            $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+            return false;
+        }
+        
+        return true;
     }
 
     /**

@@ -39,7 +39,27 @@ class ValidationTest extends TestCase
  
     public function testValidation()
     {
+        $this->assertTrue($this->validation->isSuccess());
+        $this->asserFalse($this->validation->isError());
+        $this->assertNull($this->validation->getErrorMessage());
+    }
+    
+    public function testError()
+    {
+        /*
+        Cause Error
+        $this->assertFalse($this->validation->isSuccess());
+        $this->assertTrue($this->validation->isError());
+        //$this->assertNull($this->validation->getErrorMessage());
+        */
+        $this->validation->clearError();
+        $this->assertTrue($this->validation->isSuccess());
+        $this->assertFalse($this->validation->isError());
+        $this->assertNull($this->validation->getErrorMessage());
+    }
+    
+    public function testRequiredTrue()
+    {
         $this->markTestIncomplete();
     }
-
 }
