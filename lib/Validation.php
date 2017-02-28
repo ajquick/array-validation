@@ -159,12 +159,8 @@ class Validation
      */
     public function isSuccess()
     {
-        if ($this->error) {
-            return false;
-        } else {
-            return true;
-        }
-    }
+		return (bool) !$this->error;
+	}
     
     /**
      * @return bool
