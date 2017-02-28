@@ -60,6 +60,31 @@ class ValidationTest extends TestCase
     
     public function testRequiredTrue()
     {
-        $this->markTestIncomplete();
+        $rules = [
+            'a' => ['type' => 'string', 'required' => true]
+        ];
+        $array = [
+            'a' => 'Hello'
+        ];
+        $this->validation->validate($array, $rules);
+        $this->assertTrue($this->validation->isSuccess());
+    }
+    
+    public function testRequiredTrueFailure()
+    {
+        $rules = [
+            'a' => ['type' => 'string', 'required' => true]
+        ];
+        $array = [
+            'b' => 'Hello'
+        ];
+        $this->validation->validate($array, $rules);
+        $this->assertFalse($this->validation->isSuccess());
+        $this->assertTrue($this->validation->isError());
+        $this->assertEquals('Required value not found for key a.', $this->validation->getErrorMessage());
+        $this->validation->clearError();
+        $this->assertTrue($this->validation->isSuccess());
+        $this->assertFalse($this->validation->isError());
+        $this->assertNull($this->validation->getErrorMessage());
     }
 }

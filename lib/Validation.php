@@ -120,7 +120,9 @@ class Validation
                 if (isset($value['required'])
                     && $value['required'] !== null
                     && $value['required'] != 'null') {
-                    if (!isset($array[$key]) && !array_key_exists($key, $array) && !$this->checkRequired($array, $value['required'], $key)) {
+                    if (!isset($array[$key])
+                        && !array_key_exists($key, $array)
+                        && !$this->checkRequired($array, $value['required'], $key)) {
                         return false;
                     }
                 }
