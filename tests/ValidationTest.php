@@ -66,7 +66,7 @@ class ValidationTest extends TestCase
         $array = [
             'a' => 'Hello'
         ];
-        $this->validation->validate($array, $rules);
+        $this->assertTrue($this->validation->validate($array, $rules));
         $this->assertTrue($this->validation->isSuccess());
     }
     
@@ -78,7 +78,7 @@ class ValidationTest extends TestCase
         $array = [
             'b' => 'Hello'
         ];
-        $this->validation->validate($array, $rules);
+        $this->assertFalse($this->validation->validate($array, $rules));
         $this->assertFalse($this->validation->isSuccess());
         $this->assertTrue($this->validation->isError());
         $this->assertEquals('Required value not found for key a.', $this->validation->getErrorMessage());
