@@ -198,7 +198,7 @@ class Validation
     public function clearError()
     {
         $this->error = false;
-        $thos->errorMessage = null;
+        $this->errorMessage = null;
         
         return;
     }
