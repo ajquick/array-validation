@@ -50,13 +50,13 @@ class Validation
                     return false;
                 }
             }
-        } elseif(!is_array($array)) {
-			$this->setError("Validation array not found.");
-			return false;
-		} elseif(!is_array($rules)) {
-			$this->setError("Validation rules array not found.");
-			return false;
-		}
+        } elseif (!is_array($array)) {
+            $this->setError("Validation array not found.");
+            return false;
+        } elseif (!is_array($rules)) {
+            $this->setError("Validation rules array not found.");
+            return false;
+        }
  
         if ($this->isSuccess()) {
             return true;
@@ -142,7 +142,7 @@ class Validation
     {
         if (is_array($required)) {
             if (!$this->requiredOne($array, $value, $key)) {
-                return false;    
+                return false;
             }
         } elseif (($required === true || $required == 'true')
             && !$this->requiredTrue($array, $key)) {
@@ -211,14 +211,14 @@ class Validation
     protected function requiredNull($array, $key, $key2 = null)
     {
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
-            || ((isset($array[$key]) || array_key_exists($key, $array)) 
+            || ((isset($array[$key]) || array_key_exists($key, $array))
                 && ($array[$key] === null || $array[$key] == 'null'))) {
             return true;
         }
         if (is_null()) {
             $this->setError(sprintf("Required value not found for when key %s is NULL.", $key));
         } else {
-            $this->setError(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));    
+            $this->setError(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));
         }
         
         return false;
@@ -251,13 +251,13 @@ class Validation
             foreach ($rules as $rulesKey => $rulesValue) {
                 if ((is_array($rulesKey) && $this->requiredAll($array, $rulesKey, $key))
                     || ($this->requiredTest($array, $rulesKey, $rulesValue))) {
-                    return true;    
+                    return true;
                 }
             }
         }
         $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
      
-        return false;   
+        return false;
     }
     
     /**
@@ -272,7 +272,7 @@ class Validation
             foreach ($rules as $rulesKey => $rulesValue) {
                 if (!$this->requiredTest($array, $rulesKey, $rulesValue)) {
                     $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
-                    return false;    
+                    return false;
                 }
             }
         }
