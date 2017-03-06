@@ -123,14 +123,20 @@ class Validation
                     if (!isset($array[$key])
                         && !array_key_exists($key, $array)
                         && !$this->checkRequired($array, $value['required'], $key)) {
+                        
+                        if (!isset($array[$key]) && !array_key_exists($key, $array)) {
+                            $this->setError(sprintf("Required key %s not found.", $key));
+                        }
+                        
                         return false;
                     }
                 }
             }
             return true;
+        } else {
+            $this->setError("Validation rules are not an array as expected.");
+            return false;
         }
-        
-        return false;
     }
     
     /**
@@ -159,8 +165,8 @@ class Validation
      */
     public function isSuccess()
     {
-		return (bool) !$this->error;
-	}
+        return (bool) !$this->error;
+    }
     
     /**
      * @return bool
@@ -213,7 +219,7 @@ class Validation
                 && ($array[$key] === null || $array[$key] == 'null'))) {
             return true;
         }
-        if (is_null()) {
+        if (is_null($key2) || $key2 == 'null') {
             $this->setError(sprintf("Required value not found for when key %s is NULL.", $key));
         } else {
             $this->setError(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));
@@ -429,11 +435,11 @@ class Validation
         }
         
         array_walk($compareArray, function(&$item) {
-			$item = abs($item);
-		});
+            $item = abs($item);
+        });
         asort($compareArray);
         $compareArray = array_keys($compareArray);
-		
+        
         if (count($compareArray)) {
             $errorMessage .= sprintf(' Did you mean %s?', array_shift($compareArray));
         }
