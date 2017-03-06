@@ -428,7 +428,9 @@ class Validation
             $errorMessage = sprintf('Invalid value %s.', $value);
         }
         
-        $compareArray = array_walk($compareArray, 'abs');
+        $compareArray = array_walk($compareArray, function(&$item) {
+			$item = abs($item);
+		});
         asort($compareArray);
         
         if (count($compareArray)) {
