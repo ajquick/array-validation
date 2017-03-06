@@ -432,7 +432,8 @@ class Validation
 			$item = abs($item);
 		});
         asort($compareArray);
-        
+        $compareArray = array_keys($compareArray);
+		
         if (count($compareArray)) {
             $errorMessage .= sprintf(' Did you mean %s?', array_shift($compareArray));
         }
