@@ -185,7 +185,7 @@ class Validation
     protected function setError($message)
     {
         $this->error = true;
-        $thos->errorMessage = $message;
+        $this->errorMessage = $message;
         
         return;
     }
