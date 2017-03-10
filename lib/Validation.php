@@ -20,6 +20,8 @@
 
 namespace Multidimensional\ArrayValidation;
 
+use Multidimensional\ArrayValidation\ValidationException;
+
 class Validation
 {
     public $error;
