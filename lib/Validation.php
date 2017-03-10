@@ -192,7 +192,7 @@ class Validation
     {
         $this->error = true;
         $this->errorMessage = $message;
-        
+        throw new ValidationException($message);
         return;
     }
     
@@ -434,7 +434,7 @@ class Validation
             $errorMessage = sprintf('Invalid value %s.', $value);
         }
         
-        array_walk($compareArray, function(&$item) {
+        array_walk($compareArray, function (&$item) {
             $item = abs($item);
         });
         asort($compareArray);
