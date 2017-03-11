@@ -47,17 +47,28 @@ class ValidationTest extends TestCase
     
     public function testFailure()
     {
+		try {
         $this->assertFalse($this->validation->validate('', ''));
+		} catch (ValidationException $e) {
         $this->assertFalse($this->validation->isSuccess());
         $this->assertTrue($this->validation->isError());
+		}
+		
+		try {
         $this->assertFalse($this->validation->validate([], ''));
+		} catch (ValidationException $e) {
         $this->assertFalse($this->validation->isSuccess());
         $this->assertTrue($this->validation->isError());
         $this->assertEquals('Validation rules array not found.', $this->validation->getErrorMessage());
+		}
+		
+		try {
         $this->assertFalse($this->validation->validate('', []));
+		} catch (ValidationException $e) {
         $this->assertFalse($this->validation->isSuccess());
         $this->assertTrue($this->validation->isError());
         $this->assertEquals('Validation array not found.', $this->validation->getErrorMessage());
+		}
     }
     
     public function testError()
