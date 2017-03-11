@@ -18,9 +18,6 @@
  * unless prior written permission is obtained.
  */
 
-namespace Multidimensional\ArrayValidation;
+namespace Multidimensional\ArrayValidation\Exception;
 
-class ValidationException extends \Exception
-{
-	
-}
+class ValidationException extends \Exception {}

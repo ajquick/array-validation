@@ -20,7 +20,7 @@
 
 namespace Multidimensional\ArrayValidation;
 
-use Multidimensional\ArrayValidation\ValidationException;
+use Multidimensional\ArrayValidation\Exception\ValidationException;
 
 class Validation
 {

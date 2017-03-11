@@ -20,6 +20,7 @@
 
 namespace Multidimensional\ArrayValidation\Test;
 
+use Multidimensional\ArrayValidation\Exception\ValidationException;
 use Multidimensional\ArrayValidation\Validation;
 use PHPUnit\Framework\TestCase;
 
@@ -61,16 +62,19 @@ class ValidationTest extends TestCase
     
     public function testError()
     {
-        /*
-        Cause Error
-        $this->assertFalse($this->validation->isSuccess());
-        $this->assertTrue($this->validation->isError());
-        //$this->assertNull($this->validation->getErrorMessage());
-        */
-        $this->validation->clearError();
-        $this->assertTrue($this->validation->isSuccess());
-        $this->assertFalse($this->validation->isError());
-        $this->assertNull($this->validation->getErrorMessage());
+        try {
+			/*
+			Cause Error
+			$this->assertFalse($this->validation->isSuccess());
+			$this->assertTrue($this->validation->isError());
+			//$this->assertNull($this->validation->getErrorMessage());
+			*/
+		} catch (ValidationException $e) {
+			$this->validation->clearError();
+			$this->assertTrue($this->validation->isSuccess());
+			$this->assertFalse($this->validation->isError());
+			$this->assertNull($this->validation->getErrorMessage());
+		}
     }
     
     public function testRequiredTrue()
