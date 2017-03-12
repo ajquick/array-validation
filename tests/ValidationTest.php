@@ -68,7 +68,7 @@ class ValidationTest extends TestCase
         $this->assertFalse($this->validation->isSuccess());
         $this->assertTrue($this->validation->isError());
         $this->assertEquals('Validation array not found.', $this->validation->getErrorMessage());
-		}
+		} 
     }
     
     public function testError()
