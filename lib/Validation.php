@@ -98,19 +98,14 @@ class Validation
      * @param array $array
      * @param array $rules
      * @return void
-     * @throws ValidationException
      */
     protected static function required($array, $rules)
     {
-        foreach ($rules as $key => $value) {
-            if (isset($value['required'])
-                && $value['required'] !== null
-                && $value['required'] != 'null') {
-                if (!isset($array[$key]) || !array_key_exists($key, $array)) {
-                    throw new ValidationException(sprintf("Required key '%s' not found.", $key));
+        if (is_array($rules)) {
+            foreach ($rules as $key => $value) {
+                if (isset($value['required']) && $value['required'] !== null && $value['required'] != 'null'               ) {
+                    self::checkRequired($array, $value['required'], $key);
                 }
-
-                self::checkRequired($array, $value['required'], $key);
             }
         }
 
@@ -121,13 +116,18 @@ class Validation
      * @param array $array
      * @param array $rules
      * @return void
+     * @throws ValidationException
      */
     protected static function checkRequired($array, $required, $key)
     {
         if (is_array($required)) {
-            self::requiredOne($array, $value, $key);
-        } elseif (($required === true || $required == 'true')) {
-            self::requiredTrue($array, $key);
+            $result = self::requiredOne($array, $required, $key);
+        } else {
+            $result = self::requiredTest($array, $required, $key);
+        }
+
+        if ($result && !self::requiredTrue($array, $key)) {
+            throw new ValidationException(sprintf("Required value for key '%s' not found.", $key));
         }
 
         return;
@@ -149,14 +149,14 @@ class Validation
         if (is_null($key2) || $key2 == 'null') {
             throw new ValidationException(sprintf("Required value not found for when key %s is NULL.", $key));
         } else {
-            throw new ValidationException(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));
+            throw new ValidationException(sprintf("Required value for key %s not found, required when key %s is NULL.", $key2, $key));
         }
     }
 
     /**
      * @param array $array
      * @param string $key
-     * @return true
+     * @return true|false
      * @throws ValidationException
      */
     protected static function requiredTrue($array, $key)
@@ -164,7 +164,8 @@ class Validation
         if (isset($array[$key]) || array_key_exists($key, $array)) {
             return true;
         }
-        throw new ValidationException(sprintf("Required value not found for key %s.", $key));
+        //throw new ValidationException(sprintf("Required value not found for key %s.", $key));
+        return false;
     }
 
     /**
@@ -178,28 +179,28 @@ class Validation
     {
         if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
-                if ((is_array($rulesKey) && self::requiredAll($array, $rulesKey, $key))
-                    || (self::requiredTest($array, $rulesKey, $rulesValue))) {
-                    return true;
+                if (is_array($rulesKey)) {
+                    self::requiredAll($array, $rulesKey);
+                } else {
+                    self::requiredTest($array, $rulesValue, $rulesKey);
                 }
             }
         }
-        throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+        //throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
     }
 
     /**
      * @param array $array
      * @param string|array $rules
-     * @param string $key
      * @return bool
-     * @throws ValidationException
+     * @internal param string $key
      */
-    protected static function requiredAll($array, $rules, $key)
+    protected static function requiredAll($array, $rules)
     {
         if (is_array($rules)) {
-            foreach ($rules as $rulesKey => $rulesValue) {
-                if (!self::requiredTest($array, $rulesKey, $rulesValue)) {
-                    throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+            foreach ($rules as $key => $value) {
+                if (!self::requiredTest($array, $value, $key)) {
+                    return false;
                 }
             }
         }
@@ -209,22 +210,21 @@ class Validation
 
     /**
      * @param $array
-     * @param $key
      * @param $value
-     * @return true
-     * @throws ValidationException
+     * @param $key
+     * @return bool
      */
-    protected static function requiredTest($array, $key, $value)
+    protected static function requiredTest($array, $value, $key)
     {
         if ($value === null || $value == 'null') {
-            self::requiredNull($array, $key);
+            return self::requiredNull($array, $key);
         } elseif ($value === true || $value == 'true') {
-            self::requiredTrue($array, $key);
+            return self::requiredTrue($array, $key);
         } elseif (isset($array[$key]) && $array[$key] == $value) {
-            throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

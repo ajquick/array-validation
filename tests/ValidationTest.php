@@ -76,7 +76,7 @@ class ValidationTest extends TestCase
         try {
             $this->assertFalse(Validation::validate($array, $rules));
         } catch (ValidationException $e) {
-            $this->assertEquals('Required value not found for key a.', $e->getMessage());
+            $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
         }
     }
 
