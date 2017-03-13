@@ -95,16 +95,22 @@ class Validation
     }
 
     /**
-     * @param array $array
-     * @param array $rules
+     * Main required check function. Must be fed with two variables, both of type array.
+     * Returns void if all checks pass without a ValidationException being thrown. Only
+     * performs checkRequired operation on values that are not set in the main $array.
+     *
+     * @param array $array Validation Array comprised of key / value pairs to be checked.
+     * @param array $rules Rules Array comprised of properly formatted keys with rules.
      * @return void
      */
     protected static function required($array, $rules)
     {
         if (is_array($rules)) {
             foreach ($rules as $key => $value) {
-                if (isset($value['required']) && $value['required'] !== null && $value['required'] != 'null'               ) {
-                    self::checkRequired($array, $value['required'], $key);
+                if (self::requiredNull($array, $key)) {
+                    if (isset($value['required']) && $value['required'] !== null && $value['required'] != 'null') {
+                        self::checkRequired($array, $value['required'], $key);
+                    }
                 }
             }
         }
@@ -113,20 +119,26 @@ class Validation
     }
 
     /**
+     * Actual required checking function. Takes individually passed $required variable and
+     * checks against the full $array, using $key as the base value.
+     *
      * @param array $array
-     * @param array $rules
+     * @param array|string $required
+     * @param string $key
      * @return void
      * @throws ValidationException
      */
     protected static function checkRequired($array, $required, $key)
     {
         if (is_array($required)) {
-            $result = self::requiredOne($array, $required, $key);
+            $result = self::requiredOne($array, $required);
+        } elseif ($required === true || $required == 'true') {
+            $result = true;
         } else {
-            $result = self::requiredTest($array, $required, $key);
+            throw new ValidationException(sprintf("Improper validation rules for key '%s' found.", $key));
         }
 
-        if ($result && !self::requiredTrue($array, $key)) {
+        if ($result) {
             throw new ValidationException(sprintf("Required value for key '%s' not found.", $key));
         }
 
@@ -134,66 +146,53 @@ class Validation
     }
 
     /**
+     * Returns true when $key value is null, returns false when it is not.
+     *
      * @param array $array
      * @param string $key
-     * @return true
-     * @throws ValidationException
+     * @return true|false
      */
-    protected static function requiredNull($array, $key, $key2)
+    protected static function requiredNull($array, $key)
     {
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
             || ((isset($array[$key]) || array_key_exists($key, $array))
                 && ($array[$key] === null || $array[$key] == 'null'))) {
             return true;
         }
-        if (is_null($key2) || $key2 == 'null') {
-            throw new ValidationException(sprintf("Required value not found for when key %s is NULL.", $key));
-        } else {
-            throw new ValidationException(sprintf("Required value for key %s not found, required when key %s is NULL.", $key2, $key));
-        }
-    }
 
-    /**
-     * @param array $array
-     * @param string $key
-     * @return true|false
-     * @throws ValidationException
-     */
-    protected static function requiredTrue($array, $key)
-    {
-        if (isset($array[$key]) || array_key_exists($key, $array)) {
-            return true;
-        }
-        //throw new ValidationException(sprintf("Required value not found for key %s.", $key));
         return false;
     }
 
     /**
+     * Returns true if one of the conditions comes back as requiring the key being tested
+     * to be required. Returns false if all the conditions find that checks do not require
+     * the key value to be present.
+     *
      * @param array $array
-     * @param string|array $rules
-     * @param string $key
-     * @return true
-     * @throws ValidationException
+     * @param array $rules
+     * @return true|false
      */
-    protected static function requiredOne($array, $rules, $key)
+    protected static function requiredOne($array, $rules)
     {
         if (is_array($rules)) {
-            foreach ($rules as $rulesKey => $rulesValue) {
-                if (is_array($rulesKey)) {
-                    self::requiredAll($array, $rulesKey);
-                } else {
-                    self::requiredTest($array, $rulesValue, $rulesKey);
+            foreach ($rules as $key => $value) {
+                if (is_array($key) && self::requiredAll($array, $key)) {
+                    return true;
+                } elseif (self::requiredTest($array, $value, $key)) {
+                    return true;
                 }
             }
         }
-        //throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+        return false;
     }
 
     /**
+     * Checks an array of $rules and returns false if any one of the rules fails.
+     * If all rule tests pass, then the method returns true.
+     *
      * @param array $array
-     * @param string|array $rules
-     * @return bool
-     * @internal param string $key
+     * @param array $rules
+     * @return true|false
      */
     protected static function requiredAll($array, $rules)
     {
@@ -209,10 +208,13 @@ class Validation
     }
 
     /**
+     * Returns output of testing functions. Will return true if $key is required
+     * false if the $key is not required.
+     * 
      * @param $array
      * @param $value
      * @param $key
-     * @return bool
+     * @return true|false
      */
     protected static function requiredTest($array, $value, $key)
     {
@@ -307,6 +309,7 @@ class Validation
      * @param string $value
      * @param string $key
      * @return bool
+     * @throws ValidationException
      */
     protected static function validateISO8601($value, $key)
     {
