@@ -27,68 +27,33 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationTest extends TestCase
 {
-     public $validation;
-     
-     public function setUp()
+
+    public function testEmptyValidation()
     {
-        $this->validation = new Validation();
+        $this->assertTrue(Validation::validate([], []));
     }
-    
-    public function tearDown()
-    {
-        unset($this->validation);
-    }
- 
-    public function testValidation()
-    {
-        $this->assertTrue($this->validation->isSuccess());
-        $this->assertFalse($this->validation->isError());
-        $this->assertNull($this->validation->getErrorMessage());
-    }
-    
-    public function testFailure()
-    {
-		try {
-        $this->assertFalse($this->validation->validate('', ''));
-		} catch (ValidationException $e) {
-        $this->assertFalse($this->validation->isSuccess());
-        $this->assertTrue($this->validation->isError());
-		}
-		
-		try {
-        $this->assertFalse($this->validation->validate([], ''));
-		} catch (ValidationException $e) {
-        $this->assertFalse($this->validation->isSuccess());
-        $this->assertTrue($this->validation->isError());
-        $this->assertEquals('Validation rules array not found.', $this->validation->getErrorMessage());
-		}
-		
-		try {
-        $this->assertFalse($this->validation->validate('', []));
-		} catch (ValidationException $e) {
-        $this->assertFalse($this->validation->isSuccess());
-        $this->assertTrue($this->validation->isError());
-        $this->assertEquals('Validation array not found.', $this->validation->getErrorMessage());
-		} 
-    }
-    
-    public function testError()
+
+    public function testFailedValidation()
     {
         try {
-			/*
-			Cause Error
-			$this->assertFalse($this->validation->isSuccess());
-			$this->assertTrue($this->validation->isError());
-			//$this->assertNull($this->validation->getErrorMessage());
-			*/
-		} catch (ValidationException $e) {
-			$this->validation->clearError();
-			$this->assertTrue($this->validation->isSuccess());
-			$this->assertFalse($this->validation->isError());
-			$this->assertNull($this->validation->getErrorMessage());
-		}
+            $this->assertFalse(Validation::validate('', ''));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Validation array not found.', $e->getMessage());
+        }
+
+        try {
+            $this->assertFalse(Validation::validate([], ''));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Validation rules array not found.', $e->getMessage());
+        }
+
+        try {
+            $this->assertFalse(Validation::validate('', []));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Validation array not found.', $e->getMessage());
+        }
     }
-    
+
     public function testRequiredTrue()
     {
         $rules = [
@@ -97,10 +62,9 @@ class ValidationTest extends TestCase
         $array = [
             'a' => 'Hello'
         ];
-        $this->assertTrue($this->validation->validate($array, $rules));
-        $this->assertTrue($this->validation->isSuccess());
+        $this->assertTrue(Validation::validate($array, $rules));
     }
-    
+
     public function testRequiredTrueFailure()
     {
         $rules = [
@@ -109,13 +73,223 @@ class ValidationTest extends TestCase
         $array = [
             'b' => 'Hello'
         ];
-        $this->assertFalse($this->validation->validate($array, $rules));
-        $this->assertFalse($this->validation->isSuccess());
-        $this->assertTrue($this->validation->isError());
-        $this->assertEquals('Required value not found for key a.', $this->validation->getErrorMessage());
-        $this->validation->clearError();
-        $this->assertTrue($this->validation->isSuccess());
-        $this->assertFalse($this->validation->isError());
-        $this->assertNull($this->validation->getErrorMessage());
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Required value not found for key a.', $e->getMessage());
+        }
+    }
+
+    public function testValidateValues()
+    {
+        $rules = [
+            'a' => ['type' => 'string', 'values' => ['a', 'b', 'c']]
+        ];
+        $array = [
+            'a' => 'b'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
+    public function testValidateValuesFailure()
+    {
+        $rules = [
+            'a' => ['type' => 'string', 'values' => ['cat', 'dog']]
+        ];
+        $array = [
+            'a' => 'kat'
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Invalid value kat for key a. Did you mean cat?', $e->getMessage());
+        }
+    }
+
+    public function testValidateValuesOnlyOption()
+    {
+        $rules = [
+            'a' => ['type' => 'string', 'values' => 'b']
+        ];
+        $array = [
+            'a' => 'b'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
+    public function testInteger()
+    {
+        $rules = [
+            'a' => ['type' => 'integer'],
+            'b' => ['type' => 'integer']
+        ];
+        $array = [
+            'a' => 1,
+            'b' => 2
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+        $array = [
+            'a' => 1,
+            'b' => 'one'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid integer 'one' for key b.", $e->getMessage());
+        }
+    }
+
+    public function testDecimal()
+    {
+        $rules = [
+            'a' => ['type' => 'decimal'],
+            'b' => ['type' => 'decimal']
+        ];
+        $array = [
+            'a' => 1.0,
+            'b' => 2.1
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+        $array = [
+            'a' => 1.0,
+            'b' => 'one point 2'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid decimal 'one point 2' for key b.", $e->getMessage());
+        }
+    }
+
+    public function testString()
+    {
+        $rules = [
+            'a' => ['type' => 'string'],
+            'b' => ['type' => 'string']
+        ];
+        $array = [
+            'a' => 'Yes this is obviously',
+            'b' => "a string"
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+        $array = [
+            'a' => 1,
+            'b' => 'one point 2'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid string '1' for key a.", $e->getMessage());
+        }
+    }
+
+    public function testBoolean()
+    {
+        $rules = [
+            'a' => ['type' => 'boolean'],
+            'b' => ['type' => 'boolean']
+        ];
+        $array = [
+            'a' => true,
+            'b' => false
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+        $array = [
+            'a' => 1,
+            'b' => 'false'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid boolean '1' for key a.", $e->getMessage());
+        }
+    }
+
+    public function testValidatePattern()
+    {
+        $rules = [
+            'a' => ['type' => 'string', 'pattern' => '[A-Z]{2}'],
+            'b' => ['type' => 'datetime', 'pattern' => 'ISO 8601' ]
+        ];
+        $array = [
+            'a' => 'CA',
+            'b' => '2014-01-22T14:30:51-06:00'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => 'CAT',
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid value 'CAT' does not match pattern '[A-Z]{2}' for key a.", $e->getMessage());
+        }
+
+        $array = [
+            'b' => '2014-01-22',
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Invalid value '2014-01-22' does not match ISO 8601 pattern for key b.", $e->getMessage());
+        }
+    }
+
+    public function testFieldNotInRules()
+    {
+        $rules = [
+            'a' => ['type' => 'string']
+        ];
+        $array = [
+            'a' => 'string',
+            'b' => 'unexpected'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Unexpected key 'b' found in array.", $e->getMessage());
+        }
+    }
+
+    public function testMultidimensionalValidation()
+    {
+        $rules = [
+            'a' => ['type' => 'object',
+                    'fields' => [
+                        'a' => ['type' => 'string'],
+                        'b' => ['type' => 'string']
+                    ]
+            ],
+            'b' => ['type' => 'string']
+        ];
+        $array = [
+            'a' => [
+                'a' => 'string',
+                'b' => 'test'
+            ],
+            'b' => 'b'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'b' => [
+                'a' => 'string',
+                'b' => 'test'
+            ]
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Unexpected array found for key b.", $e->getMessage());
+        }
     }
 }

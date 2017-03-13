@@ -25,197 +25,121 @@ use Multidimensional\ArrayValidation\Exception\ValidationException;
 
 class Validation
 {
-    public $error;
-    public $errorMessage;
-    
-    public function __construct()
-    {
-        $this->error = false;
-        $this->errorMessage = null;
-        
-        return;
-    }
-    
     /**
      * @param array $array
      * @param array $rules
-     * @return bool
+     * @return true
+     * @throws ValidationException
      */
-    public function validate($array, $rules)
+    public static function validate($array, $rules)
     {
         if (is_array($array) && is_array($rules)) {
-            if (!$this->required($array, $rules)) {
-                return false;
-            }
+            self::required($array, $rules);
             foreach ($array as $key => $value) {
-                if (!isset($rules[$key])
-                    || $this->validateField($value, $rules[$key], $key) !== true) {
-                    return false;
+                if (!isset($rules[$key])) {
+                    throw new ValidationException(sprintf("Unexpected key '%s' found in array.", $key));
                 }
+                self::validateField($value, $rules[$key], $key);
             }
         } elseif (!is_array($array)) {
-            $this->setError("Validation array not found.");
-            return false;
+            throw new ValidationException("Validation array not found.");
         } elseif (!is_array($rules)) {
-            $this->setError("Validation rules array not found.");
-            return false;
+            throw new ValidationException("Validation rules array not found.");
         }
- 
-        if ($this->isSuccess()) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return true;
     }
-    
+
     /**
-     * @param string $key
      * @param string $value
-     * @param array  $rules
-     * @return bool
+     * @param array $rules
+     * @param string $key
+     * @return true
+     * @throws ValidationException
      */
-    public function validateField($value, $rules, $key = null)
+    public static function validateField($value, $rules, $key)
     {
         if (is_array($value) && isset($rules['fields'])) {
-            return $this->validate($value, $rules['fields']);
+            return Validation::validate($value, $rules['fields']);
         } elseif (is_array($value)) {
-            $this->setError(sprintf("Unexpected array found for key %s.", $key));
-            return false;
+            throw new ValidationException(sprintf("Unexpected array found for key %s.", $key));
         }
 
         if (isset($value) && $value !== null && $value != 'null') {
             if (isset($rules['type'])) {
-                if (($rules['type'] === 'integer' && !$this->validateInteger($value, $key))
-                    || ($rules['type'] === 'decimal' && !$this->validateDecimal($value, $key))
-                    || ($rules['type'] === 'string'  && !$this->validateString($value, $key))
-                    || ($rules['type'] === 'boolean' && !$this->validateBoolean($value, $key))
-                ) {
-                    return false;
+                if ($rules['type'] === 'integer') {
+                    self::validateInteger($value, $key);
+                } elseif ($rules['type'] === 'decimal') {
+                    self::validateDecimal($value, $key);
+                } elseif ($rules['type'] === 'string') {
+                    self::validateString($value, $key);
+                } elseif ($rules['type'] === 'boolean') {
+                    self::validateBoolean($value, $key);
                 }
             }
-    
+
             if (isset($rules['values'])) {
-                if (!$this->validateValues($value, $rules['values'])) {
-                    return false;
-                }
+                self::validateValues($value, $rules['values'], $key);
             }
-    
+
             if (isset($rules['pattern'])) {
-                if (($rules['pattern'] == 'ISO 8601' && !$this->validateISO8601($value, $key))
-                    || (!$this->validatePattern($value, $rules['pattern'], $key))) {
-                    return false;
+                if ($rules['pattern'] == 'ISO 8601') {
+                    self::validateISO8601($value, $key);
+                } else {
+                    self::validatePattern($value, $rules['pattern'], $key);
                 }
             }
         }
-        
+
         return true;
-    }
-    
-    /**
-     * @param array $array
-     * @param array $rules
-     * @return true|false
-     */
-    public function required($array, $rules)
-    {
-        if (is_array($rules)) {
-            foreach ($rules as $key => $value) {
-                if (isset($value['required'])
-                    && $value['required'] !== null
-                    && $value['required'] != 'null') {
-                    if (!isset($array[$key])
-                        && !array_key_exists($key, $array)
-                        && !$this->checkRequired($array, $value['required'], $key)) {
-                        
-                        if (!isset($array[$key]) && !array_key_exists($key, $array)) {
-                            $this->setError(sprintf("Required key %s not found.", $key));
-                        }
-                        
-                        return false;
-                    }
-                }
-            }
-            return true;
-        } else {
-            $this->setError("Validation rules are not an array as expected.");
-            return false;
-        }
-    }
-    
-    /**
-     * Function returns true if all required checks pass, and false if a required check fails.
-     *
-     * @param array $array
-     * @param array $rules
-     * @return bool
-     */
-    public function checkRequired($array, $required, $key)
-    {
-        if (is_array($required)) {
-            if (!$this->requiredOne($array, $value, $key)) {
-                return false;
-            }
-        } elseif (($required === true || $required == 'true')
-            && !$this->requiredTrue($array, $key)) {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    /**
-     * @return bool
-     */
-    public function isSuccess()
-    {
-        return (bool) !$this->error;
-    }
-    
-    /**
-     * @return bool
-     */
-    public function isError()
-    {
-        return (bool) $this->error;
-    }
-    
-    /**
-     * @return null|string
-     */
-    public function getErrorMessage()
-    {
-        return $this->errorMessage;
     }
 
     /**
-     * @param string $message
+     * @param array $array
+     * @param array $rules
      * @return void
      * @throws ValidationException
      */
-    protected function setError($message)
+    protected static function required($array, $rules)
     {
-        $this->error = true;
-        $this->errorMessage = $message;
-        throw new ValidationException($message);
-    }
-    
-    /**
-     * @return void
-     */
-    public function clearError()
-    {
-        $this->error = false;
-        $this->errorMessage = null;
-        
+        foreach ($rules as $key => $value) {
+            if (isset($value['required'])
+                && $value['required'] !== null
+                && $value['required'] != 'null') {
+                if (!isset($array[$key]) || !array_key_exists($key, $array)) {
+                    throw new ValidationException(sprintf("Required key '%s' not found.", $key));
+                }
+
+                self::checkRequired($array, $value['required'], $key);
+            }
+        }
+
         return;
     }
-    
+
+    /**
+     * @param array $array
+     * @param array $rules
+     * @return void
+     */
+    protected static function checkRequired($array, $required, $key)
+    {
+        if (is_array($required)) {
+            self::requiredOne($array, $value, $key);
+        } elseif (($required === true || $required == 'true')) {
+            self::requiredTrue($array, $key);
+        }
+
+        return;
+    }
+
     /**
      * @param array $array
      * @param string $key
-     * @return true|false
+     * @return true
+     * @throws ValidationException
      */
-    protected function requiredNull($array, $key, $key2 = null)
+    protected static function requiredNull($array, $key, $key2)
     {
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
             || ((isset($array[$key]) || array_key_exists($key, $array))
@@ -223,100 +147,98 @@ class Validation
             return true;
         }
         if (is_null($key2) || $key2 == 'null') {
-            $this->setError(sprintf("Required value not found for when key %s is NULL.", $key));
+            throw new ValidationException(sprintf("Required value not found for when key %s is NULL.", $key));
         } else {
-            $this->setError(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));
+            throw new ValidationException(sprintf("Required value for key $s not found, required when key %s is NULL.", $key2, $key));
         }
-        
-        return false;
     }
 
     /**
      * @param array $array
      * @param string $key
-     * @return true|false
+     * @return true
+     * @throws ValidationException
      */
-    protected function requiredTrue($array, $key)
+    protected static function requiredTrue($array, $key)
     {
         if (isset($array[$key]) || array_key_exists($key, $array)) {
             return true;
         }
-        $this->setError(sprintf("Required value not found for key %s.", $key));
-        
-        return false;
+        throw new ValidationException(sprintf("Required value not found for key %s.", $key));
     }
-    
+
     /**
      * @param array $array
      * @param string|array $rules
      * @param string $key
-     * @return bool
+     * @return true
+     * @throws ValidationException
      */
-    protected function requiredOne($array, $rules, $key = null)
+    protected static function requiredOne($array, $rules, $key)
     {
         if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
-                if ((is_array($rulesKey) && $this->requiredAll($array, $rulesKey, $key))
-                    || ($this->requiredTest($array, $rulesKey, $rulesValue))) {
+                if ((is_array($rulesKey) && self::requiredAll($array, $rulesKey, $key))
+                    || (self::requiredTest($array, $rulesKey, $rulesValue))) {
                     return true;
                 }
             }
         }
-        $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
-     
-        return false;
+        throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
     }
-    
+
     /**
      * @param array $array
      * @param string|array $rules
      * @param string $key
      * @return bool
+     * @throws ValidationException
      */
-    protected function requiredAll($array, $rules, $key = null)
+    protected static function requiredAll($array, $rules, $key)
     {
         if (is_array($rules)) {
             foreach ($rules as $rulesKey => $rulesValue) {
-                if (!$this->requiredTest($array, $rulesKey, $rulesValue)) {
-                    $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
-                    return false;
+                if (!self::requiredTest($array, $rulesKey, $rulesValue)) {
+                    throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
                 }
             }
         }
-        
-        return true;
-    }
-    
-    protected function requiredTest($array, $key, $value)
-    {
-        if ($value === null || $value == 'null') {
-            return $this->requiredNull($array, $key);
-        } elseif ($value === true || $value == 'true') {
-            return $this->requiredTrue($array, $key);
-        } elseif (isset($array[$key]) && $array[$key] == $value) {
-            $this->setError(sprintf("Check failed to satisfy the requirements for key %s.", $key));
-            return false;
-        }
-        
+
         return true;
     }
 
     /**
-     * @param int         $value
+     * @param $array
+     * @param $key
+     * @param $value
+     * @return true
+     * @throws ValidationException
+     */
+    protected static function requiredTest($array, $key, $value)
+    {
+        if ($value === null || $value == 'null') {
+            self::requiredNull($array, $key);
+        } elseif ($value === true || $value == 'true') {
+            self::requiredTrue($array, $key);
+        } elseif (isset($array[$key]) && $array[$key] == $value) {
+            throw new ValidationException(sprintf("Check failed to satisfy the requirements for key %s.", $key));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param int $value
      * @param string|null $key
      * @return true|false
+     * @throws ValidationException
      */
-    protected function validateInteger($value, $key = null)
+    protected static function validateInteger($value, $key)
     {
-        if ($value != (int) $value) {
-            if (is_null($key)) {
-                      $this->setError(sprintf("Invalid integer %s != %s.", $value, (int) $value));
-            } else {
-                      $this->setError(sprintf("Invalid integer %s != %s for key %s.", $value, (int) $value, $key));
-            }
-            return false;
+        if (!is_int($value)) {
+            throw new ValidationException(sprintf("Invalid integer '%s' for key %s.", $value, $key));
         }
-        
+
         return true;
     }
 
@@ -324,103 +246,92 @@ class Validation
      * @param float       $value
      * @param string|null $key
      * @return true|false
+     * @throws ValidationException
      */
-    protected function validateDecimal($value, $key = null)
+    protected static function validateDecimal($value, $key)
     {
-        if ($value != (float) $value) {
-            if (is_null($key)) {
-                      $this->setError(sprintf("Invalid decimal %s != %s.", $value, (float) $value));
-            } else {
-                      $this->setError(sprintf("Invalid decimal %s != %s for key %s.", $value, (float) $value, $key));
-            }
-            return false;
+        if (!is_float($value)) {
+            throw new ValidationException(sprintf("Invalid decimal '%s' for key %s.", $value, $key));
         }
-        
-        return true;
-    }
-    
-    /**
-     * @param string      $value
-     * @param string|null $key
-     * @return true|false
-     */
-    protected function validateString($value, $key = null)
-    {
-        if ($value != (string) $value) {
-            if (is_null($key)) {
-                      $this->setError(sprintf("Invalid string %s != %s.", $value, (string) $value));
-            } else {
-                      $this->setError(sprintf("Invalid string %s != %s for key %s.", $value, (string) $value, $key));
-            }
-            return false;
-        }
-        
+
         return true;
     }
 
     /**
-     * @param bool        $value
+     * @param string      $value
      * @param string|null $key
      * @return true|false
+     * @throws ValidationException
      */
-    protected function validateBoolean($value, $key = null)
+    protected static function validateString($value, $key)
     {
-        if ($value != (bool) $value) {
-            if (is_null($key)) {
-                      $this->setError(sprintf("Invalid boolean %s != %s.", $value, (bool) $value));
-            } else {
-                      $this->setError(sprintf("Invalid boolean %s != %s for key %s.", $value, (bool) $value, $key));
-            }
-            return false;
+        if (!is_string($value)) {
+            throw new ValidationException(sprintf("Invalid string '%s' for key %s.", $value, $key));
         }
-        
+
         return true;
     }
-    
+
+    /**
+     * @param bool $value
+     * @param string|null $key
+     * @return true
+     * @throws ValidationException
+     */
+    protected static function validateBoolean($value, $key)
+    {
+        if (!is_bool($value)) {
+            throw new ValidationException(sprintf("Invalid boolean '%s' for key %s.", $value, $key));
+        }
+
+        return true;
+    }
+
     /**
      * @param string $value
      * @param string $pattern
      * @param string $key
      * @return bool
+     * @throws ValidationException
      */
-    protected function validatePattern($value, $pattern, $key = null)
+    protected static function validatePattern($value, $pattern, $key)
     {
         if (!preg_match('/^' . $pattern . '$/', $value)) {
-            if (is_null($key)) {
-                $this->setError(sprintf("Invalid value %s does not match pattern '%s' for key %s.", $value, $pattern, $key));
-            } else {
-                $this->setError(sprintf("Invalid value %s does not match pattern '%s'.", $value, $pattern));
-            }
-            return false;
+            throw new ValidationException(sprintf("Invalid value '%s' does not match pattern '%s' for key %s.", $value, $pattern, $key));
         }
-        
+
         return true;
     }
-    
+
     /**
      * @param string $value
      * @param string $key
      * @return bool
      */
-    protected function validateISO8601($value, $key = null)
+    protected static function validateISO8601($value, $key)
     {
         $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
-        return self::validatePattern($value, $pattern, $key);
+        if (!preg_match('/^' . $pattern . '$/', $value)) {
+            throw new ValidationException(sprintf("Invalid value '%s' does not match ISO 8601 pattern for key %s.", $value, $key));
+        }
+
+        return true;
     }
-    
+
     /**
      * @param string $value
      * @param array|string $array
      * @param string|null $key
      * @return bool
+     * @throws ValidationException
      */
-    protected function validateValues($value, $array, $key = null)
+    protected static function validateValues($value, $array, $key)
     {
         $compareArray = [];
         if (is_array($array)) {
-            foreach ($array as $key) {
-                $compareScore = strcasecmp($value, $key);
-                $compareArray[$key] = $compareScore;
+            foreach ($array as $compareKey) {
+                $compareScore = levenshtein($value, $compareKey);
+                $compareArray[$compareKey] = $compareScore;
                 if ($compareScore === 0) {
                     return true;
                 }
@@ -428,27 +339,18 @@ class Validation
         } elseif (strcasecmp($value, $array) === 0) {
             return true;
         }
-        
-        $errorMessage = '';
-        
-        if (is_null($key)) {
-            $errorMessage = sprintf('Invalid value %s for key %s.', $value, $key);
-        } else {
-            $errorMessage = sprintf('Invalid value %s.', $value);
-        }
-        
+
+        $errorMessage = sprintf('Invalid value %s for key %s.', $value, $key);
+
         array_walk($compareArray, function (&$item) {
             $item = abs($item);
         });
         asort($compareArray);
         $compareArray = array_keys($compareArray);
-        
         if (count($compareArray)) {
             $errorMessage .= sprintf(' Did you mean %s?', array_shift($compareArray));
         }
-        
-        $this->setError($errorMessage);
-        
-        return false;
+
+        throw new ValidationException($errorMessage);
     }
 }
