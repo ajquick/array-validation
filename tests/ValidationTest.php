@@ -57,15 +57,17 @@ class ValidationTest extends TestCase
     public function testRequiredTrue()
     {
         $rules = [
-            'a' => ['type' => 'string', 'required' => true]
+            'a' => ['type' => 'string', 'required' => true],
+            'b' => ['type' => 'string']
         ];
         $array = [
-            'a' => 'Hello'
+            'a' => 'Hello',
+            'b' => 'World'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'b' => 'Hello'
+            'b' => 'Goodbye'
         ];
 
         try {
@@ -365,6 +367,17 @@ class ValidationTest extends TestCase
         try {
             $this->assertFalse(Validation::validate($array, $rules));
         } catch (ValidationException $e) {
+            $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
+        }
+
+        $array = [
+            'a' => 'carrot',
+            'b' => 'banana'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
             $this->assertEquals("Required value for key 'c' not found.", $e->getMessage());
         }
     }
@@ -412,4 +425,59 @@ class ValidationTest extends TestCase
             $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
         }
     }
+
+    public function testNullValue()
+    {
+        $rules = [
+            'a' => ['type' => 'string']
+        ];
+        $array = [
+            'a' => null
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array['a'] = 'null';
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
+    public function testInvalidRequiredValue()
+    {
+        $rules = [
+            'a' => [
+                'type' => 'string',
+                'required' => 'banana'
+            ]
+        ];
+        $array = [
+            'a' => null
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
+        }
+    }
+
+    public function testRequiredWhenNull()
+    {
+        $rules = [
+            'a' =>
+                ['type' => 'string',
+                    'required' => [
+                        'b' => null
+                    ]
+                ],
+            'b' => ['type' => 'string'],
+            'c' => ['type' => 'string']
+        ];
+        $array = ['c' => 'Hi'];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
+        }
+    }
+
 }
