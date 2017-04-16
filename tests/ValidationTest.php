@@ -479,5 +479,4 @@ class ValidationTest extends TestCase
             $this->assertEquals("Required value for key 'a' not found.", $e->getMessage());
         }
     }
-
 }
