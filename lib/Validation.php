@@ -69,7 +69,7 @@ class Validation
                         if (is_array($value['required']) && !self::requiredOne($array, $value['required'])) {
                             //
                         } else {
-                            throw new ValidationException(sprintf('Required value for key "%s" not found.', $key));
+                            throw new ValidationException(sprintf('Required value not found for key: %s.', $key));
                         }
                     }
                 }
