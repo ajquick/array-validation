@@ -109,7 +109,7 @@ class Validation
             foreach ($rules as $key => $value) {
                 if (self::requiredNull($array, $key)) {
                     if (isset($value['required'])) {
-                        if (is_array($value['required']) &&  !self::requiredOne($array, $value['required'])){
+                        if (is_array($value['required']) &&  !self::requiredOne($array, $value['required'])) {
                             //
                         } else {
                             throw new ValidationException(sprintf("Required value for key '%s' not found.", $key));
