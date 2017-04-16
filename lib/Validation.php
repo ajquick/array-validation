@@ -6,9 +6,9 @@
  *   / /  / / /_/ / / /_/ / /_/ / / / / / / /  __/ / / (__  ) / /_/ / / / // /_/ / /
  *  /_/  /_/\__,_/_/\__/_/\__,_/_/_/ /_/ /_/\___/_/ /_/____/_/\____/_/ /_(_)__,_/_/
  *
- *  @author Multidimension.al
- *  @copyright Copyright © 2016-2017 Multidimension.al - All Rights Reserved
- *  @license Proprietary and Confidential
+ * @author Multidimension.al
+ * @copyright Copyright © 2016-2017 Multidimension.al - All Rights Reserved
+ * @license Proprietary and Confidential
  *
  *  NOTICE:  All information contained herein is, and remains the property of
  *  Multidimension.al and its suppliers, if any.  The intellectual and
@@ -37,58 +37,14 @@ class Validation
             self::checkRequired($array, $rules);
             foreach ($array as $key => $value) {
                 if (!isset($rules[$key])) {
-                    throw new ValidationException(sprintf("Unexpected key '%s' found in array.", $key));
+                    throw new ValidationException(sprintf('Unexpected key "%s" found in array.', $key));
                 }
                 self::validateField($value, $rules[$key], $key);
             }
         } elseif (!is_array($array)) {
-            throw new ValidationException("Validation array not found.");
+            throw new ValidationException('Validation array not found.');
         } elseif (!is_array($rules)) {
-            throw new ValidationException("Validation rules array not found.");
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $value
-     * @param array $rules
-     * @param string $key
-     * @return true
-     * @throws ValidationException
-     */
-    public static function validateField($value, $rules, $key)
-    {
-        if (is_array($value) && isset($rules['fields'])) {
-            return Validation::validate($value, $rules['fields']);
-        } elseif (is_array($value)) {
-            throw new ValidationException(sprintf("Unexpected array found for key %s.", $key));
-        }
-
-        if (isset($value) && $value !== null && $value != 'null') {
-            if (isset($rules['type'])) {
-                if ($rules['type'] === 'integer') {
-                    self::validateInteger($value, $key);
-                } elseif ($rules['type'] === 'decimal') {
-                    self::validateDecimal($value, $key);
-                } elseif ($rules['type'] === 'string') {
-                    self::validateString($value, $key);
-                } elseif ($rules['type'] === 'boolean') {
-                    self::validateBoolean($value, $key);
-                }
-            }
-
-            if (isset($rules['values'])) {
-                self::validateValues($value, $rules['values'], $key);
-            }
-
-            if (isset($rules['pattern'])) {
-                if ($rules['pattern'] == 'ISO 8601') {
-                    self::validateISO8601($value, $key);
-                } else {
-                    self::validatePattern($value, $rules['pattern'], $key);
-                }
-            }
+            throw new ValidationException('Validation rules array not found.');
         }
 
         return true;
@@ -102,6 +58,7 @@ class Validation
      * @param array $array Validation Array comprised of key / value pairs to be checked.
      * @param array $rules Rules Array comprised of properly formatted keys with rules.
      * @return void
+     * @throws ValidationException
      */
     protected static function checkRequired($array, $rules)
     {
@@ -109,10 +66,10 @@ class Validation
             foreach ($rules as $key => $value) {
                 if (self::requiredNull($array, $key)) {
                     if (isset($value['required'])) {
-                        if (is_array($value['required']) &&  !self::requiredOne($array, $value['required'])) {
+                        if (is_array($value['required']) && !self::requiredOne($array, $value['required'])) {
                             //
                         } else {
-                            throw new ValidationException(sprintf("Required value for key '%s' not found.", $key));
+                            throw new ValidationException(sprintf('Required value for key "%s" not found.', $key));
                         }
                     }
                 }
@@ -133,7 +90,8 @@ class Validation
     {
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
             || ((isset($array[$key]) || array_key_exists($key, $array))
-                && ($array[$key] === null || $array[$key] == 'null'))) {
+                && ($array[$key] === null || $array[$key] == 'null'))
+        ) {
             return true;
         }
 
@@ -203,6 +161,50 @@ class Validation
     }
 
     /**
+     * @param string $value
+     * @param array $rules
+     * @param string $key
+     * @return true
+     * @throws ValidationException
+     */
+    public static function validateField($value, $rules, $key)
+    {
+        if (is_array($value) && isset($rules['fields'])) {
+            return Validation::validate($value, $rules['fields']);
+        } elseif (is_array($value)) {
+            throw new ValidationException(sprintf('Unexpected array found for key: %s.', $key));
+        }
+
+        if (isset($value) && $value !== null && $value != 'null') {
+            if (isset($rules['type'])) {
+                if ($rules['type'] === 'integer') {
+                    self::validateInteger($value, $key);
+                } elseif ($rules['type'] === 'decimal') {
+                    self::validateDecimal($value, $key);
+                } elseif ($rules['type'] === 'string') {
+                    self::validateString($value, $key);
+                } elseif ($rules['type'] === 'boolean') {
+                    self::validateBoolean($value, $key);
+                }
+            }
+
+            if (isset($rules['values'])) {
+                self::validateValues($value, $rules['values'], $key);
+            }
+
+            if (isset($rules['pattern'])) {
+                if ($rules['pattern'] == 'ISO 8601') {
+                    self::validateISO8601($value, $key);
+                } else {
+                    self::validatePattern($value, $rules['pattern'], $key);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @param int $value
      * @param string|null $key
      * @return true|false
@@ -211,14 +213,14 @@ class Validation
     protected static function validateInteger($value, $key)
     {
         if (!is_int($value)) {
-            throw new ValidationException(sprintf("Invalid integer '%s' for key %s.", $value, $key));
+            throw new ValidationException(sprintf('Invalid integer "%s" for key: %s.', $value, $key));
         }
 
         return true;
     }
 
     /**
-     * @param float       $value
+     * @param float $value
      * @param string|null $key
      * @return true|false
      * @throws ValidationException
@@ -226,14 +228,14 @@ class Validation
     protected static function validateDecimal($value, $key)
     {
         if (!is_float($value)) {
-            throw new ValidationException(sprintf("Invalid decimal '%s' for key %s.", $value, $key));
+            throw new ValidationException(sprintf('Invalid decimal "%s" for key: %s.', $value, $key));
         }
 
         return true;
     }
 
     /**
-     * @param string      $value
+     * @param string $value
      * @param string|null $key
      * @return true|false
      * @throws ValidationException
@@ -241,7 +243,7 @@ class Validation
     protected static function validateString($value, $key)
     {
         if (!is_string($value)) {
-            throw new ValidationException(sprintf("Invalid string '%s' for key %s.", $value, $key));
+            throw new ValidationException(sprintf('Invalid string "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -256,39 +258,7 @@ class Validation
     protected static function validateBoolean($value, $key)
     {
         if (!is_bool($value)) {
-            throw new ValidationException(sprintf("Invalid boolean '%s' for key %s.", $value, $key));
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $value
-     * @param string $pattern
-     * @param string $key
-     * @return bool
-     * @throws ValidationException
-     */
-    protected static function validatePattern($value, $pattern, $key)
-    {
-        if (!preg_match('/^' . $pattern . '$/', $value)) {
-            throw new ValidationException(sprintf("Invalid value '%s' does not match pattern '%s' for key %s.", $value, $pattern, $key));
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $value
-     * @param string $key
-     * @return bool
-     * @throws ValidationException
-     */
-    protected static function validateISO8601($value, $key)
-    {
-        $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
-        if (!preg_match('/^' . $pattern . '$/', $value)) {
-            throw new ValidationException(sprintf("Invalid value '%s' does not match ISO 8601 pattern for key %s.", $value, $key));
+            throw new ValidationException(sprintf('Invalid boolean "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -316,7 +286,7 @@ class Validation
             return true;
         }
 
-        $errorMessage = sprintf('Invalid value %s for key %s.', $value, $key);
+        $errorMessage = sprintf('Invalid value "%s" for key: %s.', $value, $key);
 
         array_walk($compareArray, function (&$item) {
             $item = abs($item);
@@ -324,9 +294,41 @@ class Validation
         asort($compareArray);
         $compareArray = array_keys($compareArray);
         if (count($compareArray)) {
-            $errorMessage .= sprintf(' Did you mean %s?', array_shift($compareArray));
+            $errorMessage .= sprintf(' Did you mean "%s"?', array_shift($compareArray));
         }
 
         throw new ValidationException($errorMessage);
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     * @throws ValidationException
+     */
+    protected static function validateISO8601($value, $key)
+    {
+        $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
+        if (!preg_match('/^' . $pattern . '$/', $value)) {
+            throw new ValidationException(sprintf('Invalid value "%s" does not match ISO 8601 pattern for key: %s.', $value, $key));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $value
+     * @param string $pattern
+     * @param string $key
+     * @return bool
+     * @throws ValidationException
+     */
+    protected static function validatePattern($value, $pattern, $key)
+    {
+        if (!preg_match('/^' . $pattern . '$/', $value)) {
+            throw new ValidationException(sprintf('Invalid value "%s" does not match pattern "%s" for key: %s.', $value, $pattern, $key));
+        }
+
+        return true;
     }
 }
