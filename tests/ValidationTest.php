@@ -168,6 +168,17 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testRequiredDecimal()
+    {
+        $rules = [
+            'a' => ['type' => 'decimal', 'required' => true]
+        ];
+        $array = [
+            'a' => 0
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
     public function testString()
     {
         $rules = [
