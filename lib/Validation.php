@@ -92,7 +92,7 @@ class Validation
     {
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
             || ((isset($array[$key]) || array_key_exists($key, $array))
-                && ($array[$key] === null || $array[$key] == 'null'))
+                && ($array[$key] === null || $array[$key] === 'null'))
         ) {
             return true;
         }
@@ -174,7 +174,7 @@ class Validation
 
         if (is_array($value) && strtoupper($rules['type']) === 'GROUP') {
             foreach ($value AS $groupKey => $groupValue) {
-                Validation::validate($groupValue, $rules['fields'], $groupKey);
+                Validation::validate($groupValue, $rules['fields']);
             }
             return true;
         } elseif (is_array($value) && isset($rules['fields'])) {
