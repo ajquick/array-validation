@@ -309,6 +309,30 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testGroupValidation()
+    {
+        $rules2 = [
+            'b' => ['type' => 'string']
+        ];
+        $rules = [
+            'a' => [
+                'type' => 'group',
+                'fields' => $rules2
+                ]
+        ];
+        $array = [
+            'a' => [['b' => 'Hello']]
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+        $array = [
+            'a' => [
+                ['b' => 'Hello'],
+                ['b' => 'World'],
+            ]
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
     public function testRequiredComplex()
     {
         $rules = [

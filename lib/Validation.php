@@ -171,7 +171,13 @@ class Validation
      */
     public static function validateField($value, $rules, $key)
     {
-        if (is_array($value) && isset($rules['fields'])) {
+
+        if (is_array($value) && strtoupper($rules['type']) === 'GROUP') {
+            foreach ($value AS $groupKey => $groupValue) {
+                Validation::validate($groupValue, $rules['fields'], $groupKey);
+            }
+            return true;
+        } elseif (is_array($value) && isset($rules['fields'])) {
             return Validation::validate($value, $rules['fields']);
         } elseif (is_array($value)) {
             throw new ValidationException(sprintf('Unexpected array found for key: %s.', $key));
