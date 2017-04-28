@@ -525,4 +525,23 @@ class ValidationTest extends TestCase
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
     }
+
+    public function testUnexpectedArray()
+    {
+        $rules = [
+            'a' => [
+                'type' => 'string'
+            ]
+        ];
+        $array = [
+            'a' => [
+                'b' => 'c'
+            ]
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Unexpected array found for key: a.', $e->getMessage());
+        }
+    }
 }
