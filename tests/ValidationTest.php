@@ -213,6 +213,17 @@ class ValidationTest extends TestCase
             'b' => false
         ];
         $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => 'true',
+            'b' => 'false'
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (ValidationException $e) {
+            $this->assertEquals('Invalid boolean "true" for key: a.', $e->getMessage());
+        }
+
         $array = [
             'a' => 1,
             'b' => 'false'

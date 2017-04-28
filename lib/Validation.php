@@ -6,9 +6,9 @@
  *   / /  / / /_/ / / /_/ / /_/ / / / / / / /  __/ / / (__  ) / /_/ / / / // /_/ / /
  *  /_/  /_/\__,_/_/\__/_/\__,_/_/_/ /_/ /_/\___/_/ /_/____/_/\____/_/ /_(_)__,_/_/
  *
- * @author Multidimension.al
- * @copyright Copyright © 2016-2017 Multidimension.al - All Rights Reserved
- * @license Proprietary and Confidential
+ *  @author Multidimension.al
+ *  @copyright Copyright © 2016-2017 Multidimension.al - All Rights Reserved
+ *  @license Proprietary and Confidential
  *
  *  NOTICE:  All information contained herein is, and remains the property of
  *  Multidimension.al and its suppliers, if any.  The intellectual and
@@ -171,13 +171,16 @@ class Validation
      */
     public static function validateField($value, $rules, $key)
     {
-
-        if (is_array($value) && strtoupper($rules['type']) === 'GROUP') {
-            foreach ($value AS $groupKey => $groupValue) {
-                Validation::validate($groupValue, $rules['fields']);
+        if (is_array($value) && is_array($rules) && isset($rules['fields']) && isset($rules['type']) && strtoupper($rules['type']) === 'GROUP') {
+            foreach ($value as $groupKey => $groupValue) {
+                if (is_array($groupValue)) {
+                    Validation::validate($groupValue, $rules['fields']);
+                } else {
+                    Validation::validateField($groupValue, $rules['fields'], $groupKey);
+                }
             }
             return true;
-        } elseif (is_array($value) && isset($rules['fields'])) {
+        } elseif (is_array($value) && is_array($rules) && isset($rules['fields'])) {
             return Validation::validate($value, $rules['fields']);
         } elseif (is_array($value)) {
             throw new ValidationException(sprintf('Unexpected array found for key: %s.', $key));
