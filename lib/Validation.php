@@ -36,10 +36,15 @@ class Validation
         if (is_array($array) && is_array($rules)) {
             self::checkRequired($array, $rules);
             foreach ($array as $key => $value) {
-                if (!isset($rules[$key])) {
+                if (!isset($rules[$key]) && !array_key_exists($key, $rules)) {
                     throw new ValidationException(sprintf('Unexpected key "%s" found in array.', $key));
                 }
-                self::validateField($value, $rules[$key], $key);
+
+                if (is_array($value) && isset($rules[$key]['type']) && strtolower($rules[$key]['type']) == 'array' && isset($rules[$key]['fields'])) {
+                    self::validate($value, $rules[$key]['fields']);
+                } elseif (in_array($key, array_keys($rules))) {
+                    self::validateField($value, $rules[$key], $key);
+                }
             }
         } elseif (!is_array($array)) {
             throw new ValidationException('Validation array not found.');
@@ -171,17 +176,14 @@ class Validation
      */
     public static function validateField($value, $rules, $key)
     {
-        if (is_array($value) && is_array($rules) && isset($rules['fields']) && isset($rules['type']) && strtoupper($rules['type']) === 'GROUP') {
-            foreach ($value as $groupKey => $groupValue) {
-                if (is_array($groupValue)) {
-                    Validation::validate($groupValue, $rules['fields']);
-                } else {
-                    Validation::validateField($groupValue, $rules['fields'], $groupKey);
+        if (is_array($value) && isset($rules['type']) && strtolower($rules['type']) == 'group' && isset($rules['fields'])) {
+            foreach ($value as $k => $v) {
+                if (is_array($v) && !isset($rules['fields'][$k])) {
+                    self::validate($v, $rules['fields']);
+                } elseif (isset($rules['fields'][$k])) {
+                    self::validateField($v, $rules['fields'][$k], $k);
                 }
             }
-            return true;
-        } elseif (is_array($value) && is_array($rules) && isset($rules['fields'])) {
-            return Validation::validate($value, $rules['fields']);
         } elseif (is_array($value)) {
             throw new ValidationException(sprintf('Unexpected array found for key: %s.', $key));
         }

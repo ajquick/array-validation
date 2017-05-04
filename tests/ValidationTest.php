@@ -289,7 +289,7 @@ class ValidationTest extends TestCase
     public function testMultidimensionalValidation()
     {
         $rules = [
-            'a' => ['type' => 'object',
+            'a' => ['type' => 'array',
                 'fields' => [
                     'a' => ['type' => 'string'],
                     'b' => ['type' => 'string']
@@ -543,5 +543,251 @@ class ValidationTest extends TestCase
         } catch (ValidationException $e) {
             $this->assertEquals('Unexpected array found for key: a.', $e->getMessage());
         }
+    }
+
+    public function testMultiDimensionalArray()
+    {
+        $rules = [
+            'RateV4Response' => [
+                'type' => 'array',
+                'fields' => [
+                    'Package' => [
+                        'type' => 'group',
+                        'fields' => [
+                            '@ID' => [
+                                'type' => 'string',
+                                'required' => true
+                            ],
+                            'ZipOrigination' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'pattern' => '\d{5}'
+                            ],
+                            'ZipDestination' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'pattern' => '\d{5}'
+                            ],
+                            'Pounds' => [
+                                'type' => 'decimal',
+                                'required' => true,
+                            ],
+                            'Ounces' => [
+                                'type' => 'decimal',
+                                'required' => true,
+                            ],
+                            'FirstClassMailType' => [
+                                'type' => 'string'
+                            ],
+                            'Container' => [
+                                'type' => 'string',
+                            ],
+                            'Size' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'values' => [
+                                    'REGULAR',
+                                    'LARGE'
+                                ]
+                            ],
+                            'Width' => [
+                                'type' => 'decimal'
+                            ],
+                            'Length' => [
+                                'type' => 'decimal'
+                            ],
+                            'Height' => [
+                                'type' => 'decimal'
+                            ],
+                            'Girth' => [
+                                'type' => 'decimal'
+                            ],
+                            'Machinable' => [
+                                'type' => 'boolean'
+                            ],
+                            'Zone' => [
+                                'type' => 'string'
+                            ],
+                            'Postage' => [
+                                'type' => 'group',
+                                'required' => true,
+                                'fields' => [
+                                    '@CLASSID' => [
+                                        'type' => 'integer'
+                                    ],
+                                    'MailService' => [
+                                        'type' => 'string'
+                                    ],
+                                    'Rate' => [
+                                        'type' => 'decimal'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $array = [
+            'RateV4Response' => [
+                'Package' => [
+                    '@ID' => '123',
+                    'ZipOrigination' => '20500',
+                    'ZipDestination' => '90210',
+                    'Pounds' => 0.0,
+                    'Ounces' => 32.0,
+                    'Size' => 'REGULAR',
+                    'Machinable' => true,
+                    'Zone' => '8',
+                    'Postage' => [
+                        0 => [
+                            '@CLASSID' => 1,
+                            'MailService' => 'Priority Mail 2-Day<sup>™</sup>',
+                            'Rate' => 12.75
+                        ],
+                        1 => [
+                            '@CLASSID' => 22,
+                            'MailService' => 'Priority Mail 2-Day<sup>™</sup> Large Flat Rate Box',
+                            'Rate' => 18.85
+                        ],
+                        2 => [
+                            '@CLASSID' => 17,
+                            'MailService' => 'Priority Mail 2-Day<sup>™</sup> Medium Flat Rate Box',
+                            'Rate' => 13.60
+                        ],
+                        3 => [
+                            '@CLASSID' => 28,
+                            'MailService' => 'Priority Mail 2-Day<sup>™</sup> Small Flat Rate Box',
+                            'Rate' => 7.15
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+    }
+
+    public function testMultiMultiMultidimensionalArray()
+    {
+        $rules = [
+            'RateV4Response' => [
+                'type' => 'array',
+                'fields' => [
+                    'Package' => [
+                        'type' => 'group',
+                        'fields' => [
+                            '@ID' => [
+                                'type' => 'string',
+                                'required' => true
+                            ],
+                            'ZipOrigination' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'pattern' => '\d{5}'
+                            ],
+                            'ZipDestination' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'pattern' => '\d{5}'
+                            ],
+                            'Pounds' => [
+                                'type' => 'decimal',
+                                'required' => true,
+                            ],
+                            'Ounces' => [
+                                'type' => 'decimal',
+                                'required' => true,
+                            ],
+                            'FirstClassMailType' => [
+                                'type' => 'string'
+                            ],
+                            'Container' => [
+                                'type' => 'string',
+                            ],
+                            'Size' => [
+                                'type' => 'string',
+                                'required' => true,
+                                'values' => [
+                                    'REGULAR',
+                                    'LARGE'
+                                ]
+                            ],
+                            'Width' => [
+                                'type' => 'decimal'
+                            ],
+                            'Length' => [
+                                'type' => 'decimal'
+                            ],
+                            'Height' => [
+                                'type' => 'decimal'
+                            ],
+                            'Girth' => [
+                                'type' => 'decimal'
+                            ],
+                            'Machinable' => [
+                                'type' => 'boolean'
+                            ],
+                            'Zone' => [
+                                'type' => 'string'
+                            ],
+                            'Postage' => [
+                                'type' => 'group',
+                                'required' => true,
+                                'fields' => [
+                                    '@CLASSID' => [
+                                        'type' => 'integer'
+                                    ],
+                                    'MailService' => [
+                                        'type' => 'string'
+                                    ],
+                                    'Rate' => [
+                                        'type' => 'decimal'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $array = [
+            'RateV4Response' => [
+                'Package' => [
+                    0 => [
+                        '@ID' => '123',
+                        'ZipOrigination' => '20500',
+                        'ZipDestination' => '90210',
+                        'Pounds' => 0.0,
+                        'Ounces' => 32.0,
+                        'Size' => 'REGULAR',
+                        'Machinable' => true,
+                        'Zone' => '8',
+                        'Postage' => [
+                            0 => [
+                                '@CLASSID' => 1,
+                                'MailService' => 'Priority Mail 2-Day<sup>™</sup>',
+                                'Rate' => 12.75
+                            ],
+                            1 => [
+                                '@CLASSID' => 22,
+                                'MailService' => 'Priority Mail 2-Day<sup>™</sup> Large Flat Rate Box',
+                                'Rate' => 18.85
+                            ],
+                            2 => [
+                                '@CLASSID' => 17,
+                                'MailService' => 'Priority Mail 2-Day<sup>™</sup> Medium Flat Rate Box',
+                                'Rate' => 13.60
+                            ],
+                            3 => [
+                                '@CLASSID' => 28,
+                                'MailService' => 'Priority Mail 2-Day<sup>™</sup> Small Flat Rate Box',
+                                'Rate' => 7.15
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
     }
 }
