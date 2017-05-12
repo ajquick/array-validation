@@ -21,7 +21,7 @@
 
 namespace Multidimensional\ArrayValidation\Test;
 
-use Multidimensional\ArrayValidation\Exception\ValidationException;
+use \Exception;
 use Multidimensional\ArrayValidation\Validation;
 use PHPUnit\Framework\TestCase;
 
@@ -37,19 +37,19 @@ class ValidationTest extends TestCase
     {
         try {
             $this->assertFalse(Validation::validate('', ''));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Validation array not found.', $e->getMessage());
         }
 
         try {
             $this->assertFalse(Validation::validate([], ''));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Validation rules array not found.', $e->getMessage());
         }
 
         try {
             $this->assertFalse(Validation::validate('', []));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Validation array not found.', $e->getMessage());
         }
     }
@@ -72,7 +72,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
 
@@ -80,7 +80,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
     }
@@ -106,7 +106,7 @@ class ValidationTest extends TestCase
         ];
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid value "kat" for key: a. Did you mean "cat"?', $e->getMessage());
         }
     }
@@ -140,7 +140,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid integer "one" for key: b.', $e->getMessage());
         }
     }
@@ -163,7 +163,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid decimal "one point 2" for key: b.', $e->getMessage());
         }
     }
@@ -197,7 +197,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid string "1" for key: a.', $e->getMessage());
         }
     }
@@ -220,7 +220,7 @@ class ValidationTest extends TestCase
         ];
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid boolean "true" for key: a.', $e->getMessage());
         }
 
@@ -231,7 +231,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid boolean "1" for key: a.', $e->getMessage());
         }
     }
@@ -254,7 +254,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid value "CAT" does not match pattern "[A-Z]{2}" for key: a.', $e->getMessage());
         }
 
@@ -264,7 +264,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Invalid value "2014-01-22" does not match ISO 8601 pattern for key: b.', $e->getMessage());
         }
     }
@@ -281,7 +281,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Unexpected key "b" found in array.', $e->getMessage());
         }
     }
@@ -315,7 +315,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals("Unexpected array found for key: b.", $e->getMessage());
         }
     }
@@ -391,7 +391,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: b.', $e->getMessage());
         }
 
@@ -402,7 +402,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: c.', $e->getMessage());
         }
 
@@ -412,7 +412,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
 
@@ -423,7 +423,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: c.', $e->getMessage());
         }
     }
@@ -451,7 +451,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
 
@@ -459,7 +459,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
 
@@ -467,7 +467,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
     }
@@ -500,7 +500,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
     }
@@ -521,7 +521,7 @@ class ValidationTest extends TestCase
 
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
     }
@@ -540,7 +540,7 @@ class ValidationTest extends TestCase
         ];
         try {
             $this->assertFalse(Validation::validate($array, $rules));
-        } catch (ValidationException $e) {
+        } catch (Exception $e) {
             $this->assertEquals('Unexpected array found for key: a.', $e->getMessage());
         }
     }

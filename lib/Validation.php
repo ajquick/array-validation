@@ -21,7 +21,7 @@
 
 namespace Multidimensional\ArrayValidation;
 
-use Multidimensional\ArrayValidation\Exception\ValidationException;
+use \Exception;
 
 class Validation
 {
@@ -29,7 +29,7 @@ class Validation
      * @param array $array
      * @param array $rules
      * @return true
-     * @throws ValidationException
+     * @throws Exception
      */
     public static function validate($array, $rules)
     {
@@ -37,7 +37,7 @@ class Validation
             self::checkRequired($array, $rules);
             foreach ($array as $key => $value) {
                 if (!isset($rules[$key]) && !array_key_exists($key, $rules)) {
-                    throw new ValidationException(sprintf('Unexpected key "%s" found in array.', $key));
+                    throw new Exception(sprintf('Unexpected key "%s" found in array.', $key));
                 }
 
                 if (is_array($value) && isset($rules[$key]['type']) && strtolower($rules[$key]['type']) == 'array' && isset($rules[$key]['fields'])) {
@@ -47,9 +47,9 @@ class Validation
                 }
             }
         } elseif (!is_array($array)) {
-            throw new ValidationException('Validation array not found.');
+            throw new Exception('Validation array not found.');
         } elseif (!is_array($rules)) {
-            throw new ValidationException('Validation rules array not found.');
+            throw new Exception('Validation rules array not found.');
         }
 
         return true;
@@ -57,13 +57,13 @@ class Validation
 
     /**
      * Main required check function. Must be fed with two variables, both of type array.
-     * Returns void if all checks pass without a ValidationException being thrown. Only
+     * Returns void if all checks pass without a Exception being thrown. Only
      * performs checkRequired operation on values that are not set in the main $array.
      *
      * @param array $array Validation Array comprised of key / value pairs to be checked.
      * @param array $rules Rules Array comprised of properly formatted keys with rules.
      * @return void
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function checkRequired($array, $rules)
     {
@@ -76,7 +76,7 @@ class Validation
                         } elseif (($value['required'] == 'true' || $value['required'] === true) && isset($array[$key])) {
                             //
                         } else {
-                            throw new ValidationException(sprintf('Required value not found for key: %s.', $key));
+                            throw new Exception(sprintf('Required value not found for key: %s.', $key));
                         }
                     }
                 }
@@ -172,7 +172,7 @@ class Validation
      * @param array $rules
      * @param string $key
      * @return true
-     * @throws ValidationException
+     * @throws Exception
      */
     public static function validateField($value, $rules, $key)
     {
@@ -185,7 +185,7 @@ class Validation
                 }
             }
         } elseif (is_array($value)) {
-            throw new ValidationException(sprintf('Unexpected array found for key: %s.', $key));
+            throw new Exception(sprintf('Unexpected array found for key: %s.', $key));
         }
 
         if (isset($value) && $value !== null && $value != 'null') {
@@ -221,12 +221,12 @@ class Validation
      * @param int $value
      * @param string|null $key
      * @return true|false
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateInteger($value, $key)
     {
         if (!is_int($value)) {
-            throw new ValidationException(sprintf('Invalid integer "%s" for key: %s.', $value, $key));
+            throw new Exception(sprintf('Invalid integer "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -236,12 +236,12 @@ class Validation
      * @param float $value
      * @param string|null $key
      * @return true|false
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateDecimal($value, $key)
     {
         if (!is_float($value)) {
-            throw new ValidationException(sprintf('Invalid decimal "%s" for key: %s.', $value, $key));
+            throw new Exception(sprintf('Invalid decimal "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -251,12 +251,12 @@ class Validation
      * @param string $value
      * @param string|null $key
      * @return true|false
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateString($value, $key)
     {
         if (!is_string($value)) {
-            throw new ValidationException(sprintf('Invalid string "%s" for key: %s.', $value, $key));
+            throw new Exception(sprintf('Invalid string "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -266,12 +266,12 @@ class Validation
      * @param bool $value
      * @param string|null $key
      * @return true
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateBoolean($value, $key)
     {
         if (!is_bool($value)) {
-            throw new ValidationException(sprintf('Invalid boolean "%s" for key: %s.', $value, $key));
+            throw new Exception(sprintf('Invalid boolean "%s" for key: %s.', $value, $key));
         }
 
         return true;
@@ -282,7 +282,7 @@ class Validation
      * @param array|string $array
      * @param string|null $key
      * @return bool
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateValues($value, $array, $key)
     {
@@ -310,20 +310,20 @@ class Validation
             $errorMessage .= sprintf(' Did you mean "%s"?', array_shift($compareArray));
         }
 
-        throw new ValidationException($errorMessage);
+        throw new Exception($errorMessage);
     }
 
     /**
      * @param string $value
      * @param string $key
      * @return bool
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validateISO8601($value, $key)
     {
         $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
         if (!preg_match('/^' . $pattern . '$/', $value)) {
-            throw new ValidationException(sprintf('Invalid value "%s" does not match ISO 8601 pattern for key: %s.', $value, $key));
+            throw new Exception(sprintf('Invalid value "%s" does not match ISO 8601 pattern for key: %s.', $value, $key));
         }
 
         return true;
@@ -334,12 +334,12 @@ class Validation
      * @param string $pattern
      * @param string $key
      * @return bool
-     * @throws ValidationException
+     * @throws Exception
      */
     protected static function validatePattern($value, $pattern, $key)
     {
         if (!preg_match('/^' . $pattern . '$/', $value)) {
-            throw new ValidationException(sprintf('Invalid value "%s" does not match pattern "%s" for key: %s.', $value, $pattern, $key));
+            throw new Exception(sprintf('Invalid value "%s" does not match pattern "%s" for key: %s.', $value, $pattern, $key));
         }
 
         return true;
