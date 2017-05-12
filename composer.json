@@ -1,11 +1,13 @@
 {
     "name": "multidimensional/array-validation",
     "description": "Validate an array using rules from another array.",
-    "authors": [{
-        "name": "multidimension.al",
-        "homepage": "https://multidimension.al",
-        "role": "Developer"
-    }],
+    "authors": [
+        {
+            "name": "multidimension.al",
+            "homepage": "https://multidimension.al",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": ">=5.5"
     },
