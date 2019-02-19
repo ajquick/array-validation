@@ -1,6 +1,7 @@
 {
     "name": "multidimensional/array-validation",
     "description": "Validate an array using rules from another array.",
+    "license": "MIT",
     "authors": [
         {
             "name": "multidimension.al",
