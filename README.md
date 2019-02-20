@@ -135,9 +135,7 @@ Here you can see the required functionality can be made to be quite complex.
 In some instances where you would only have a small subset of specific values that would be considered valid, you can specify those values in the ruleset by providing am arrau of valid values.
 
 ```php
-$rules = [
-    'a' => ['type' => 'string', 'values' => ['cat', 'dog']]
-];
+$rules = ['a' => ['type' => 'string', 'values' => ['cat', 'dog']]];
 ```
 
 In the above example, key 'a' must be either "cat" or "dog". Note that this string comparison is case-insensitive!
