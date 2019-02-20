@@ -8,7 +8,7 @@
 [![Total Downloads](https://poser.pugx.org/multidimensional/array-validation/d/total.svg)](https://packagist.org/packages/multidimensional/array-validation)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/multidimension-al/array-validation/badges/quality-score.png)](https://scrutinizer-ci.com/g/multidimension-al/array-validation/)
 
-This library allows for validation of an array using another array as a ruleset. Validation rules include requiring specific keys, specific types and specific values. When the validation fails, the library throws a normal _Exception_. For best results, also consider using our [Array Sanitization]() library which will correct errors and force type corrections prior to validation.
+This library allows for validation of an array using another array as a ruleset. Validation rules include requiring specific keys, specific types and specific values. When the validation fails, the library throws a normal _Exception_. For best results, also consider using our [Array Sanitization](https://github.com/multidimension-al/array-sanitization) library which will correct errors and force type corrections prior to validation.
 
 ## Requirements
 
