@@ -45,15 +45,13 @@ How to use in your code:
 __Create Ruleset__
 
 ```php
-$rules = array(
-    'keyName' => array ('type' => 'string', 'required' => true)
-);
+$rules = ['keyName' => ['type' => 'string', 'required' => true]];
 ```
 
 __Check an array against that ruleset__
 
 ```php
-$array = array('keyName' => 'text');
+$array = ['keyName' => 'text'];
 $bool = Validation::validate($array, $rules);
 echo $bool; //true
 ```
