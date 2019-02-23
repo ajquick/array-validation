@@ -70,8 +70,7 @@ There are several different valid types for the values in the array they are as 
 * Integer
 * Decimal
 * Boolean
-* Datetime
-* Array / Group
+* Group (Multidimensional array)
 
 ### Pattern Matching
 
