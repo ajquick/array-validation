@@ -88,7 +88,7 @@ Built in patterns available for matching:
 * URL
 * Email
 * IP Address (IPv4 or IPv6)
-* MAC Address (Dashes or Colons) 
+* MAC Address (Dashes, Colons or Dots) 
 * [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
 
 ### Required Values

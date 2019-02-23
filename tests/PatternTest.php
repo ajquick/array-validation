@@ -31,15 +31,15 @@ class PatternTest extends TestCase
     public function testPatternURL()
     {
         $rules = [
-            'a' => ['type' => 'string', 'pattern' => 'URL'],
+            'a' => ['type' => 'string', 'pattern' => 'URL']
         ];
         $array = [
-            'a' => 'http://www.google.com/',
+            'a' => 'http://www.google.com/'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => '<a href="http://www.google.com/">Google</a>',
+            'a' => '<a href="http://www.google.com/">Google</a>'
         ];
 
         try {
@@ -52,15 +52,15 @@ class PatternTest extends TestCase
     public function testPatternEmail()
     {
         $rules = [
-            'a' => ['type' => 'string', 'pattern' => 'EMAIL'],
+            'a' => ['type' => 'string', 'pattern' => 'EMAIL']
         ];
         $array = [
-            'a' => 'noreply@domain.com',
+            'a' => 'noreply@domain.com'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => 'noreply AT domain.com',
+            'a' => 'noreply AT domain.com'
         ];
 
         try {
@@ -73,20 +73,25 @@ class PatternTest extends TestCase
     public function testPatternMAC()
     {
         $rules = [
-            'a' => ['type' => 'string', 'pattern' => 'MAC'],
+            'a' => ['type' => 'string', 'pattern' => 'MAC']
         ];
         $array = [
-            'a' => 'AB:CD:EF:12:34:56',
-        ];
-        $this->assertTrue(Validation::validate($array, $rules));
-
-        $array = [
-            'a' => 'AB-CD-EF-12-34-56',
+            'a' => 'AB:CD:EF:12:34:56'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => '127.0.0.1',
+            'a' => 'AB-CD-EF-12-34-56'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => 'ABCD.EF12.3456'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => '127.0.0.1'
         ];
 
         try {
@@ -99,30 +104,35 @@ class PatternTest extends TestCase
     public function testPatternIP()
     {
         $rules = [
-            'a' => ['type' => 'string', 'pattern' => 'IP'],
+            'a' => ['type' => 'string', 'pattern' => 'IP']
         ];
         $array = [
-            'a' => '127.0.0.1',
-        ];
-        $this->assertTrue(Validation::validate($array, $rules));
-
-        $array = [
-            'a' => '255.255.255.255',
+            'a' => '127.0.0.1'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => '0.0.0.0',
+            'a' => '255.255.255.255'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+            'a' => '0.0.0.0'
         ];
         $this->assertTrue(Validation::validate($array, $rules));
 
         $array = [
-            'a' => '127/0/0/1',
+            'a' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => '2001:0DB8:1111::'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $array = [
+            'a' => '127/0/0/1'
         ];
 
         try {
