@@ -69,11 +69,11 @@ class Validation
     {
         if (is_array($rules)) {
             foreach ($rules as $key => $value) {
-                if (self::requiredNull($array, $key)) {
+                if (self::requiredNull($array, $key) || self::requiredEmpty($array, $key)) {
                     if (isset($value['required'])) {
                         if (is_array($value['required']) && !self::requiredOne($array, $value['required'])) {
                             //
-                        } elseif (($value['required'] == 'true' || $value['required'] === true) && isset($array[$key])) {
+                        } elseif (($value['required'] == 'true' || $value['required'] === true) && isset($array[$key]) && (!empty($array[$key]) || is_numeric($array[$key]) )) {
                             //
                         } else {
                             throw new Exception(sprintf('Required value not found for key: %s.', $key));
@@ -98,6 +98,25 @@ class Validation
         if ((!isset($array[$key]) && !array_key_exists($key, $array))
             || ((isset($array[$key]) || array_key_exists($key, $array))
                 && ($array[$key] === null || $array[$key] === 'null'))
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true when $key value is null, returns false when it is not.
+     *
+     * @param array $array
+     * @param string $key
+     * @return true|false
+     */
+    protected static function requiredEmpty($array, $key)
+    {
+        if ((!isset($array[$key]) && !array_key_exists($key, $array))
+            || ((isset($array[$key]) || array_key_exists($key, $array))
+                && (empty($array[$key] && !is_numeric($array[$key]))))
         ) {
             return true;
         }
@@ -160,6 +179,8 @@ class Validation
     {
         if (is_null($value) || $value == 'null') {
             return self::requiredNull($array, $key);
+        } elseif (empty($value) && !is_numeric($value)) {
+            return self::requiredEmpty($array, $key);
         } elseif (isset($array[$key]) && $array[$key] == $value) {
             return true;
         }
@@ -188,7 +209,7 @@ class Validation
             throw new Exception(sprintf('Unexpected array found for key: %s.', $key));
         }
 
-        if (isset($value) && $value !== null && $value != 'null') {
+        if (isset($value) && $value !== null && $value != 'null' && (!empty($value) || is_numeric($value))) {
             if (isset($rules['type'])) {
                 if ($rules['type'] === 'integer') {
                     self::validateInteger($value, $key);

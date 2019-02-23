@@ -142,4 +142,70 @@ class PatternTest extends TestCase
         }
     }
 
+    public function testPatternNotRequired()
+    {
+        $rules = [
+            'a' => ['type' => 'int', 'pattern' => '\d{5}'],
+            'b' => ['type' => 'int', 'pattern' => '\d{5}'],
+            'c' => ['type' => 'int', 'pattern' => '\d{5}']
+        ];
+        $array = [
+            'a' => null,
+            'b' => '',
+            'c' => 55555
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $rules = [
+            'a' => ['type' => 'int', 'pattern' => '\d{5}', 'required' => true]
+        ];
+        $array = [
+            'a' => null
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: a.', $e->getMessage());
+        }
+
+        $array = [
+            'a' => ''
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: a.', $e->getMessage());
+        }
+
+        $rules = [
+            'a' => ['type' => 'int', 'pattern' => '\d{1}', 'required' => true]
+        ];
+        $array = [
+            'a' => 0
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $rules = [
+            'a' => ['type' => 'int', 'required' => true]
+        ];
+        $array = [
+            'a' => 0
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+        $rules = [
+            'a' => ['type' => 'string', 'pattern' => 'IP'],
+            'b' => ['type' => 'string', 'pattern' => 'IP'],
+            'c' => ['type' => 'string', 'pattern' => 'IP']
+        ];
+        $array = [
+            'a' => null,
+            'b' => '',
+            'c' => '127.0.0.1'
+        ];
+        $this->assertTrue(Validation::validate($array, $rules));
+
+    }
+
+
 }
