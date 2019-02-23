@@ -397,7 +397,32 @@ class ValidationTest extends TestCase
 
         $array = [
             'a' => 'banana',
+            'b' => '',
+            'c' => 'orange'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: b.', $e->getMessage());
+        }
+
+        $array = [
+            'a' => 'banana',
             'b' => 'carrot'
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: c.', $e->getMessage());
+        }
+
+
+        $array = [
+            'a' => 'banana',
+            'b' => 'carrot',
+            'c' => ''
         ];
 
         try {
@@ -415,6 +440,19 @@ class ValidationTest extends TestCase
         } catch (Exception $e) {
             $this->assertEquals('Required value not found for key: a.', $e->getMessage());
         }
+
+        $array = [
+            'a' => '',
+            'b' => 'banana',
+            'c' => ''
+        ];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: a.', $e->getMessage());
+        }
+
 
         $array = [
             'a' => 'carrot',
@@ -512,6 +550,27 @@ class ValidationTest extends TestCase
                 ['type' => 'string',
                     'required' => [
                         'b' => null
+                    ]
+                ],
+            'b' => ['type' => 'string'],
+            'c' => ['type' => 'string']
+        ];
+        $array = ['c' => 'Hi'];
+
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Required value not found for key: a.', $e->getMessage());
+        }
+    }
+
+    public function testRequiredWhenEmpty()
+    {
+        $rules = [
+            'a' =>
+                ['type' => 'string',
+                    'required' => [
+                        'b' => ''
                     ]
                 ],
             'b' => ['type' => 'string'],

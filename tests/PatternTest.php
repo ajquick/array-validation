@@ -145,9 +145,9 @@ class PatternTest extends TestCase
     public function testPatternNotRequired()
     {
         $rules = [
-            'a' => ['type' => 'int', 'pattern' => '\d{5}'],
-            'b' => ['type' => 'int', 'pattern' => '\d{5}'],
-            'c' => ['type' => 'int', 'pattern' => '\d{5}']
+            'a' => ['type' => 'integer', 'pattern' => '\d{5}'],
+            'b' => ['type' => 'integer', 'pattern' => '\d{5}'],
+            'c' => ['type' => 'integer', 'pattern' => '\d{5}']
         ];
         $array = [
             'a' => null,
@@ -178,7 +178,7 @@ class PatternTest extends TestCase
         }
 
         $rules = [
-            'a' => ['type' => 'int', 'pattern' => '\d{1}', 'required' => true]
+            'a' => ['type' => 'integer', 'pattern' => '\d{1}', 'required' => true]
         ];
         $array = [
             'a' => 0
@@ -186,7 +186,7 @@ class PatternTest extends TestCase
         $this->assertTrue(Validation::validate($array, $rules));
 
         $rules = [
-            'a' => ['type' => 'int', 'required' => true]
+            'a' => ['type' => 'integer', 'required' => true]
         ];
         $array = [
             'a' => 0
