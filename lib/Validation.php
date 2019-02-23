@@ -206,8 +206,16 @@ class Validation
             }
 
             if (isset($rules['pattern'])) {
-                if ($rules['pattern'] == 'ISO 8601') {
+                if (strtoupper($rules['pattern']) == 'ISO 8601' || strtoupper($rules['pattern']) == 'ISO8601') {
                     self::validateISO8601($value, $key);
+                } else if (strtoupper($rules['pattern']) == 'URL') {
+                    self::validateURL($value, $key);
+                } else if (strtoupper($rules['pattern']) == 'EMAIL') {
+                    self::validateEmail($value, $key);
+                } else if (strtoupper($rules['pattern']) == 'IP') {
+                    self::validateIP($value, $key);
+                } else if (strtoupper($rules['pattern']) == 'MAC') {
+                    self::validateMAC($value, $key);
                 } else {
                     self::validatePattern($value, $rules['pattern'], $key);
                 }
@@ -328,6 +336,67 @@ class Validation
 
         return true;
     }
+
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     * @throws Exception
+     */
+    protected static function validateURL($value, $key)
+    {
+        if(!filter_var($value, FILTER_VALIDATE_URL)){
+            throw new Exception(sprintf('Invalid value "%s" does not match URL pattern for key: %s.', $value, $key));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     * @throws Exception
+     */
+    protected static function validateEmail($value, $key)
+    {
+        if(!filter_var($value, FILTER_VALIDATE_EMAIL)){
+            throw new Exception(sprintf('Invalid value "%s" does not match email pattern for key: %s.', $value, $key));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     * @throws Exception
+     */
+    protected static function validateIP($value, $key)
+    {
+        if(!filter_var($value, FILTER_VALIDATE_IP)){
+            throw new Exception(sprintf('Invalid value "%s" does not match IP address pattern for key: %s.', $value, $key));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $value
+     * @param string $key
+     * @return bool
+     * @throws Exception
+     */
+    protected static function validateMAC($value, $key)
+    {
+        if(!filter_var($value, FILTER_VALIDATE_MAC)){
+            throw new Exception(sprintf('Invalid value "%s" does not match MAC address pattern for key: %s.', $value, $key));
+        }
+
+        return true;
+    }
+
 
     /**
      * @param string $value

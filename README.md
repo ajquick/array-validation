@@ -75,13 +75,21 @@ There are several different valid types for the values in the array they are as 
 
 ### Pattern Matching
 
-You can specify basic regular expressions that can be used to access whether a value is valid or not. Additionally, you can specify _ISO 8601_ to match against an [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) date format.
+You can specify basic regular expressions that can be used to access whether a value is valid or not.
 
 Examples of pattern matching:
 
 * [A-Z]{2} _(match two capital letters)_
 * \d{5} _(matches 5 digits)_
 * \d{5}-\d{4} _(matches ZIP+4)_
+
+Built in patterns available for matching:
+
+* URL
+* Email
+* IP Address (IPv4 or IPv6)
+* MAC Address (Dashes or Colons) 
+* [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
 
 ### Required Values
 
