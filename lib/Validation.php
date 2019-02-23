@@ -210,7 +210,7 @@ class Validation
         }
 
         if (isset($value) && $value !== null && $value != 'null' && (!empty($value) || is_numeric($value))) {
-            if (isset($rules['type'])) {
+            if (isset($rules['type']) && $rules['type'] != 'group') {
                 if ($rules['type'] === 'integer') {
                     self::validateInteger($value, $key);
                 } elseif ($rules['type'] === 'decimal') {
@@ -219,6 +219,8 @@ class Validation
                     self::validateString($value, $key);
                 } elseif ($rules['type'] === 'boolean') {
                     self::validateBoolean($value, $key);
+                } else {
+                    throw new Exception(sprintf('Invalid type "%s" for key: %s.', $rules['type'], $key));
                 }
             }
 

@@ -236,11 +236,26 @@ class ValidationTest extends TestCase
         }
     }
 
+    public function testInvaldType()
+    {
+        $rules = [
+            'a' => ['type' => 'abcdef']
+        ];
+        $array = [
+            'a' => 'This isn\'t real.'
+        ];
+        try {
+            $this->assertFalse(Validation::validate($array, $rules));
+        } catch (Exception $e) {
+            $this->assertEquals('Invalid type "abcdef" for key: a.', $e->getMessage());
+        }
+    }
+
     public function testValidatePattern()
     {
         $rules = [
             'a' => ['type' => 'string', 'pattern' => '[A-Z]{2}'],
-            'b' => ['type' => 'datetime', 'pattern' => 'ISO 8601']
+            'b' => ['type' => 'string', 'pattern' => 'ISO 8601']
         ];
         $array = [
             'a' => 'CA',
