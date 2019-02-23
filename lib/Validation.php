@@ -309,7 +309,7 @@ class Validation
 
         $errorMessage = sprintf('Invalid value "%s" for key: %s.', $value, $key);
 
-        array_walk($compareArray, function (&$item) {
+        array_walk($compareArray, function(&$item) {
             $item = abs($item);
         });
         asort($compareArray);
@@ -330,7 +330,7 @@ class Validation
     protected static function validateISO8601($value, $key)
     {
         $pattern = '(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)';
-        if (!preg_match('/^' . $pattern . '$/', $value)) {
+        if (!preg_match('/^'.$pattern.'$/', $value)) {
             throw new Exception(sprintf('Invalid value "%s" does not match ISO 8601 pattern for key: %s.', $value, $key));
         }
 
@@ -345,7 +345,7 @@ class Validation
      */
     protected static function validateURL($value, $key)
     {
-        if(!filter_var($value, FILTER_VALIDATE_URL)){
+        if (!filter_var($value, FILTER_VALIDATE_URL)) {
             throw new Exception(sprintf('Invalid value "%s" does not match URL pattern for key: %s.', $value, $key));
         }
 
@@ -360,7 +360,7 @@ class Validation
      */
     protected static function validateEmail($value, $key)
     {
-        if(!filter_var($value, FILTER_VALIDATE_EMAIL)){
+        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             throw new Exception(sprintf('Invalid value "%s" does not match email pattern for key: %s.', $value, $key));
         }
 
@@ -375,7 +375,7 @@ class Validation
      */
     protected static function validateIP($value, $key)
     {
-        if(!filter_var($value, FILTER_VALIDATE_IP)){
+        if (!filter_var($value, FILTER_VALIDATE_IP)) {
             throw new Exception(sprintf('Invalid value "%s" does not match IP address pattern for key: %s.', $value, $key));
         }
 
@@ -390,7 +390,7 @@ class Validation
      */
     protected static function validateMAC($value, $key)
     {
-        if(!filter_var($value, FILTER_VALIDATE_MAC)){
+        if (!filter_var($value, FILTER_VALIDATE_MAC)) {
             throw new Exception(sprintf('Invalid value "%s" does not match MAC address pattern for key: %s.', $value, $key));
         }
 
@@ -407,7 +407,7 @@ class Validation
      */
     protected static function validatePattern($value, $pattern, $key)
     {
-        if (!preg_match('/^' . $pattern . '$/', $value)) {
+        if (!preg_match('/^'.$pattern.'$/', $value)) {
             throw new Exception(sprintf('Invalid value "%s" does not match pattern "%s" for key: %s.', $value, $pattern, $key));
         }
 
