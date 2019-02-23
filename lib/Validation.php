@@ -73,7 +73,7 @@ class Validation
                     if (isset($value['required'])) {
                         if (is_array($value['required']) && !self::requiredOne($array, $value['required'])) {
                             //
-                        } elseif (($value['required'] == 'true' || $value['required'] === true) && isset($array[$key]) && (!empty($array[$key]) || is_numeric($array[$key]) )) {
+                        } elseif (($value['required'] == 'true' || $value['required'] === true) && isset($array[$key]) && (!empty($array[$key]) || is_numeric($array[$key]))) {
                             //
                         } else {
                             throw new Exception(sprintf('Required value not found for key: %s.', $key));
